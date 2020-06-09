@@ -1,0 +1,22 @@
+---
+title: "R Markdown Trial 1"
+author: "Zeynep Civelek"
+date: "June 9, 2020"
+output:
+  html_document: default
+  pdf_document: default
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# run only once to download the data
+
+stroop_data <- read.csv("stroop.csv", sep = " ", header = TRUE)
+
+
+```
+
