@@ -7,6 +7,8 @@ output: html_document
 
 ```{r global_options, echo=FALSE, warning=FALSE, message=FALSE, include=FALSE}
 knitr::opts_chunk$set(echo=FALSE, warning=FALSE, message=FALSE, include=TRUE)
+
+#This sets general options for the code chunks in the R Markdown file. The echo, warning, and message = FALSE hide the code chunks, warning messages, and other messages, where the ‘include=true’ will make all figures appear in the text. You can set some of these variables to TRUE, and hit Knit to see what they change. Sometimes you might want to share the HTML file with all code visible, for example when sharing with collaborators. 
 ```
 
 
