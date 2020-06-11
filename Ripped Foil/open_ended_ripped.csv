@@ -1,0 +1,69 @@
+id,age,sex,order,boxtype,answer,explanation,transfer,overall
+14,5,f,penfirst,blue-right,I saw your arm going in there,2,1,1
+15,4,f,penfirst,blue-right,there was a hole in there,3,0.875,0.875
+16,4,m,stickerfirst,blue-right,"in there, blue and pink",1,0.625,0.75
+17,5,m,penfirst,blue-right,"I saw the stickers go into the cups - I don't know to ""but how did you know which cup it went in?""",1,1,1
+18,3,f,stickerfirst,blue-right,points to the cups in an alternating way,1,0.375,0.5625
+19,3,f,penfirst,blue-right,it was in the pink one,1,0.75,0.75
+21,5,f,stickerfirst,blue-right,they made holes,3,1,1
+22,5,m,stickerfirst,blue-right,I saw your hand going into the cups,2,1,1
+25,4,f,stickerfirst,blue-right,I don't know,1,0.75,0.875
+26,4,m,stickerfirst,blue-right,I found it. It went to that one and that one,2,0.75,0.6875
+29,5,m,stickerfirst,blue-right,"I have x-ray vision, I saw through",2,0.75,0.875
+32,5,m,penfirst,pink-right,I don't know,1,0.5,0.6875
+33,4,f,stickerfirst,pink-right,it got popped,3,0.875,0.9375
+34,4,m,stickerfirst,pink-right,it got broken,3,1,1
+35,4,f,penfirst,pink-right,I don't know,1,0.75,0.875
+36,3,m,penfirst,pink-right,I did but couldn't explain,1,0.625,0.5
+38,4,m,stickerfirst,pink-right,I heard it,2,0.75,0.75
+39,5,f,penfirst,pink-right,just knew. I saw which cup you went in,2,1,0.9375
+40,4,f,penfirst,blue-right,by watching. Couldn't explain,1,0.625,0.75
+41,5,m,stickerfirst,blue-right,followed the pen and the sticker. It got ripped,3,1,1
+42,3,f,stickerfirst,pink-right,in that one and in that one. I don't know.,1,0.625,0.625
+43,4,f,stickerfirst,pink-right,"pointed to both cups, in that one and in that one, didn't see anything",1,0.625,0.625
+45,4,m,penfirst,pink-right,I saw the holes,3,0.875,0.9375
+46,3,f,penfirst,pink-right,,1,0.5,0.5625
+48,4,f,stickerfirst,pink-right,"pointed to one of the cups, couldn't explain",1,0.875,0.625
+49,4,f,penfirst,pink-right,I heard it,2,1,0.75
+53,5,m,penfirst,pink-right,"I chose the cup, I thought.",2,1,0.8125
+54,3,f,stickerfirst,blue-right,I don't know,1,0.625,0.625
+55,4,m,penfirst,blue-right,I watched you pop it,3,1,1
+56,3,m,stickerfirst,pink-right,it was in both,1,0.5,0.625
+57,5,f,stickerfirst,pink-right,I saw you pop,3,0.875,0.875
+58,4,f,stickerfirst,blue-right,I saw you poke,3,0.875,0.875
+59,4,m,penfirst,blue-right,"I'm an expert, easy peasy",2,0.5,0.5
+60,4,f,penfirst,blue-right,"I watched, looked at the cups and chose. I thought",2,0.5,0.6875
+62,3,f,stickerfirst,blue-right,pointed to the cups,1,0.375,0.5625
+63,4,f,penfirst,pink-right,pointed to the cups. You put it in that cup,1,0.875,0.75
+64,5,m,stickerfirst,blue-right,you made a hole with the pen,3,0.75,0.8125
+65,5,m,penfirst,blue-right,my brain worked. I don't know,2,1,1
+66,5,m,stickerfirst,pink-right,you made a hole with the pen but I can't remember,3,0.5,0.375
+67,3,m,stickerfirst,pink-right,couldn't explain. Said dinosaur,1,0.5,0.5625
+69,4,f,penfirst,pink-right,I guessed,1,0.875,0.9375
+70,3,m,stickerfirst,pink-right,pointed to the cups,1,0.375,0.5625
+72,4,m,stickerfirst,pink-right,you smashed it when you put it in,3,0.875,0.9375
+73,4,f,stickerfirst,pink-right,it was tricky,1,0.5,0.6875
+75,3,m,penfirst,blue-right,pointed to the cups,1,0.375,0.4375
+76,3,f,penfirst,pink-right,I don't know,1,0.5,0.4375
+77,3,f,penfirst,blue-right,no reply,1,0.5,0.5
+78,4,f,stickerfirst,blue-right,because you put it in the same cup,2,0.375,0.375
+80,4,f,stickerfirst,blue-right,you made noises (she didn't notice anything else),2,1,1
+82,4,f,stickerfirst,pink-right,couldn't explain.,1,0.625,0.5
+83,4,m,penfirst,blue-right,"doesn't speak much english, couldn't explain",1,0.75,0.8125
+84,4,m,penfirst,blue-right,"because I'm fast. Just ""because"". No further explanations",2,1,1
+85,5,f,penfirst,pink-right,made popping gesture with foil,3,0.75,0.75
+87,4,m,stickerfirst,blue-right,I saw you crack it,3,1,1
+88,5,f,stickerfirst,pink-right,I remembered where it went,3,0.875,0.9375
+89,4,m,penfirst,blue-right,blue one. Couldn't explain,1,0.5,0.3125
+90,3,m,penfirst,blue-right,I'm clever. She hid it,2,0.25,0.4375
+91,5,m,penfirst,blue-right,there was a pattern. RLRL,2,1,0.8125
+92,5,f,stickerfirst,pink-right,because you did pen first,3,0.875,0.9375
+94,4,m,stickerfirst,pink-right,"don't remember, can't remember",1,0.5,0.6875
+96,3,f,penfirst,pink-right,"this one, pointing to the pink",1,0.5,0.5
+97,5,f,penfirst,blue-right,I've got good memory. I listened to my mind and not the pen,2,1,1
+98,3,m,penfirst,pink-right,"this one, this one, pointing to each box",1,0.875,0.8125
+100,5,m,penfirst,pink-right,I heard it. I picked the right one,2,0.875,0.9375
+103,4,m,penfirst,pink-right,I've got a good memory,2,0.875,0.875
+105,5,f,penfirst,pink-right,"didn't explain, was shy",1,1,0.875
+106,5,f,stickerfirst,pink-right,because you put them one at a time,1,1,1
+107,3,f,stickerfirst,pink-right,pointed to the pink one,1,0.5,0.5

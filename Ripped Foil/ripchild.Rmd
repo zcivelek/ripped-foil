@@ -1,0 +1,332 @@
+---
+title: "Ripped Foil - Children"
+author: "Zeynep Civelek"
+date: "June 10, 2020"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, warning=FALSE, message=FALSE, include=TRUE)
+
+#This sets general options for the code chunks in the R Markdown file. The echo, warning, and message = FALSE hide the code chunks, warning messages, and other messages, where the ‘include=true’ will make all figures appear in the text. You can set some of these variables to TRUE, and hit Knit to see what they change. Sometimes you might want to share the HTML file with all code visible, for example when sharing with collaborators. 
+```
+
+```{r}
+#PREPARE
+R.Version()#for referencing, shows you which R version you are using
+rm(list=ls())#removes any other items in your workspace
+ls()#check whether workspace is empty
+```
+
+```{r}
+#Directory is set, data is added and all the libraries necessary for running the analyses are loaded.
+
+setwd("C:/Users/Zeynep/Desktop/ripped-foil/Ripped Foil")
+ripchild<-read.csv("ripped_child.csv", header=T)
+
+#all the libraries necessary to run the analyses
+library(lme4)
+library(readr)
+library(tidyverse)
+library(sjPlot)
+#install.packages('TMB', type='source')
+library(ggthemes)
+library(gridExtra)
+library(reshape2)
+library(car)
+library(psych)
+library("ggpubr")
+library(dplyr)
+
+```
+
+The structure of the data is shown below with all the variable names and levels of measurement.
+
+```{r}
+ripchild$age <- as.factor(ripchild$age)# makes continuous variables categorical
+ripchild$id<-as.factor(ripchild$id)
+ripchild$sex<-as.factor(ripchild$sex)
+
+levels(ripchild$agecat)
+str(ripchild)
+
+```
+
+We decided to use age as a continuous variable (age in months) in our main analyses rather than categorical to have more power.
+
+```{r pressure, echo=FALSE}
+hist(ripchild$agemonths, xlab="Age in months (36-72)", ylab="Frequency")
+
+```
+
+I aggregated the trial-by-trial data to create one score per child for Test and Transfer phases so I can check whether they are normally distributed or not.
+
+```{r}
+ripchild_individual <- ripchild %>%
+  group_by(id, age, agemonths) %>% 
+  summarize(correct = mean(correct)) 
+
+ripchild_separate <- ripchild %>%
+  group_by(order3, id, age, agemonths) %>% 
+  summarize(correct = mean(correct)) 
+
+ripchild_test <- ripchild %>%
+  filter(order3=="test") %>%
+  group_by(id, age, agemonths) %>% 
+  summarize(correct = mean(correct))
+
+ripchild_transfer <- ripchild %>%
+  filter(order3=="transfer") %>%
+  group_by(id,age, agemonths) %>% 
+  summarize(correct = mean(correct)) 
+
+```
+
+Histograms for Test and Transfer
+```{r}
+hist(ripchild_test$correct, xlab="Mean score in Test", xlim=c(0,1))
+hist(ripchild_transfer$correct, xlab="Mean score in Transfer", xlim=c(0,1))
+hist(ripchild_individual$correct, xlab="Overall score (Test and Transfer)", xlim=c(0,1))
+```
+
+
+```{r}
+
+shapiro.test(ripchild_individual$correct)
+
+shapiro.test(ripchild_test$correct)
+
+shapiro.test(ripchild_transfer$correct)
+```
+
+The Shapiro-Wilk normality tests confirm that the data are not normally distributed for Test and Transfer phases (neither for an overall score).
+
+
+
+Next is the pre-processing of data (z-transformations for 'trial no' and 'age in months'; checking if factors are correctly identified, coding dummy variables for trialtype, sex and phase (order3), and fially centering the random slope components for these variables.
+
+```{r}
+#Preprocessing of data, Z-transforming trial no and age
+
+ripchild$z.trialno<-as.vector(scale(ripchild$trialno))
+ripchild$z.age=as.vector(scale(ripchild$agemonths))
+
+ripchild$trialtype<-relevel(ripchild$trialtype, ref = "pen")
+summary(ripchild)
+```
+
+```{r}
+#Coding dummy variables before centering the slopes
+ripchild$trialtype.sticker<-as.numeric(ripchild$trialtype==levels(ripchild$trialtype)[2])
+ripchild$sex.m<-as.numeric(ripchild$sex==levels(ripchild$sex)[2])
+ripchild$order3.transfer<-as.numeric(ripchild$order3==levels(ripchild$order3)[2])
+
+#Centering the slopes
+ripchild$trialtype.sticker.c<-ripchild$trialtype.sticker-mean(ripchild$trialtype.sticker)
+ripchild$sex.m.c<-ripchild$sex.m -mean(ripchild$sex.m)
+ripchild$order3.transfer.c<-ripchild$order3.transfer-mean(ripchild$order3.transfer)
+```
+
+
+```{r}
+source("C:/Users/Zeynep/Desktop/ripped-foil/Ripped Foil/Roger_functions/diagnostic_fcns.r")
+source("C:/Users/Zeynep/Desktop/ripped-foil/Ripped Foil/Roger_functions/glmm_stability.r")
+source("C:/Users/Zeynep/Desktop/ripped-foil/Ripped Foil/Roger_functions/boot_glmm.r")
+```
+
+![Checking assumptions]
+* Is the design balanced?
+
+```{r}
+xx.fe.re=fe.re.tab(fe.model="correct  ~
+                  trialtype*order3+trialno+
+                   z.age*order3+sex",
+                   re="(1|id)",
+                   data=data.frame(ripchild))
+xx.fe.re$summary
+ydata=xx.fe.re$data
+```
+
+
+
+Full model
+
+```{r}
+contr<-glmerControl(optimizer="bobyqa", optCtrl=list(maxfun=10000000))
+full<-glmer(correct ~ trialtype*order3+z.trialno+z.age*order3+sex+(1|id)+(0+z.trialno+order3.transfer.c+trialtype.sticker.c|id),data=ripchild, family=binomial, control=contr)
+
+```
+
+Null model
+
+```{r}
+null<-glmer(correct~ 1+(1|id)+(0+z.trialno+order3.transfer.c+trialtype.sticker.c|id),data=ripchild, family=binomial, control=contr)
+
+```
+
+Full and Null comparison
+```{r}
+round(anova(null, full, test="Chisq"),3)
+
+```
+
+Model output
+
+Coefficients
+
+```{r}
+round(summary(full)$coefficients, 3)
+
+```
+
+Individual predictor: Likelihood tests
+
+```{r}
+xdrop1=drop1(full, test="Chisq",control=contr)
+round(xdrop1,3)
+```
+
+The interactions terms are not significant (although there is a trend for scores to vary by age) so I will remove them from the model.
+
+Reduced model without the interactions
+Full model 2
+
+```{r}
+full2<-glmer(correct ~ trialtype+order3+z.trialno+z.age+sex+(1|id)++(0+z.trialno+order3.transfer.c+trialtype.sticker.c|id),data=ripchild, family=binomial, control=contr)
+summary(full2)
+```
+
+Null model
+
+```{r}
+null<-glmer(correct~ 1+(1|id)+(0+z.trialno+order3.transfer.c+trialtype.sticker.c|id),data=ripchild, family=binomial, control=contr)
+
+```
+
+Full 2 and null comparision
+
+```{r}
+round(anova(null, full2, test="Chisq"),3)
+
+```
+
+####Model output
+  +Coefficients
+
+```{r echo=FALSE}
+round(summary(full2)$coefficients, 3)
+
+```
+
+  + Individual predictors : Likelihod ratio tests
+  
+  
+```{r echo=FALSE}
+xdrop1=drop1(full2, test="Chisq",control=contr)
+round(xdrop1,3)
+```
+
+Age emerges as a significant predictor of scores.
+
+
+```{r}
+# this is for me to check the variance added by random effects, number of observations and subjects etc.
+print(summary(full2), corr=FALSE)
+```
+
+```{r}
+save.image()
+```
+
+
+Getting confidence intervals for fitted values
+```{r}
+boot.res=boot.glmm.pred(model.res=full2, excl.warnings=T, nboots=1000, resol=68,
+level=0.95, use="z.age")
+
+boot.res$ci.estimates
+```
+
+Attempt at getting the predictions and CI to the plot for age ~ correct
+
+```{r}
+correctBYage<-ggplot(ripchild_individual, aes(agemonths, correct), ylim=c(0,1))
+s1<-correctBYage + geom_point(aes(), position="jitter") + labs(x= "Age in months", y= "Mean Performance in Test and Transfer")+ 
+  theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+s1
+```
+
+
+
+
+
+```{r}
+#create sequence with agemonths against which lines should be plotted:
+plot.agemonths=seq(from=min(ripchild_individual$agemonths), to=max(ripchild_individual$agemonths), length.out=68)
+plot.agemonths
+
+```
+
+
+```{r}
+#there are 68 different data points (agemonths) and the argument resol of the function boot.glmm.pred was set to this value
+lines(plot.agemonths, boot.res$ci.predicted$fitted, lty=2)
+lines(plot.agemonths, boot.res$ci.predicted$lower.cl, lty=3)
+lines(plot.agemonths, boot.res$ci.predicted$upper.cl, lty=3)
+```
+
+
+Find effect sizes for the full model- calculation at Roger
+
+
+```{r}
+plot_model(full2, type="est") 
+```
+
+Model assumptions
+
+```{r}
+diagnostics.plot(full2)
+```
+Not sure what these show to me...
+
+```{r}
+ranef.diagn.plot(full2)
+```
+
+Run model stability and colliniearity next.
+
+
+
+Next, I'll look at the distribution of children's performances in Test and Transfer phases across age groups.
+
+```{r, echo=TRUE}
+testBYage<-ggplot(ripchild_test, aes(agemonths, correct))
+s1<-testBYage + geom_point(aes(), position="jitter") + labs(x= "Age in months", y= "Mean Performance in Test")+ 
+  geom_smooth(method ="lm", alpha=0.2)+
+  theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+
+transferBYage<-ggplot(ripchild_transfer, aes(agemonths, correct))
+s2<-transferBYage + geom_point(aes(), position="jitter") + labs(x= "Age in months", y= "Mean Performance in Transfer") + 
+  geom_smooth(method ="lm", alpha=0.2) +
+  theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+grid.arrange(s1, s2, nrow = 1, heights=unit(100, "mm"))
+```
+
+The regression line (with a 95% CI) for the Transfer phase is steeper than the Test phase. Younger children seem to be doing worse in Transfer than in Test.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
