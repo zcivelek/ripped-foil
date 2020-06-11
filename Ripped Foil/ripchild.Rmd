@@ -21,7 +21,7 @@ ls()#check whether workspace is empty
 ```{r}
 #Directory is set, data is added and all the libraries necessary for running the analyses are loaded.
 
-setwd("C:/Users/Zeynep/Desktop/ripped-foil/Ripped Foil")
+#setwd("C:/Users/Zeynep/Desktop/ripped-foil/Ripped Foil")
 ripchild<-read.csv("ripped_child.csv", header=T)
 
 #all the libraries necessary to run the analyses
@@ -127,9 +127,9 @@ ripchild$order3.transfer.c<-ripchild$order3.transfer-mean(ripchild$order3.transf
 
 
 ```{r}
-source("C:/Users/Zeynep/Desktop/ripped-foil/Ripped Foil/Roger_functions/diagnostic_fcns.r")
-source("C:/Users/Zeynep/Desktop/ripped-foil/Ripped Foil/Roger_functions/glmm_stability.r")
-source("C:/Users/Zeynep/Desktop/ripped-foil/Ripped Foil/Roger_functions/boot_glmm.r")
+source("./Roger_functions/diagnostic_fcns.r")
+source("./Roger_functions/glmm_stability.r")
+source("./Roger_functions/boot_glmm.r")
 ```
 
 
@@ -242,13 +242,10 @@ full.CI=glmer(correct ~ z.trialno+order3.transfer.c+trialtype.sticker.c+agemonth
 Getting confidence intervals for fitted values
 
 ```{r}
-
-
-boot.res=boot.glmm.pred(model.res=full.CI, excl.warnings=T, nboots=1000, resol=68, level=0.95, use="agemonths")
-
+boot.res=boot.glmm.pred(model.res=full.CI, excl.warnings=T, nboots=100, resol=68, level=0.95, use="agemonths", n.cores="all-1", para=T)#with para=T your computer will get very slow so I recommend using this option particularly when you don't need to work with the PC in parallel (the CI calculation will be a lot faster though)
 
 boot.res$ci.estimates
-save.image()
+save.image("ripped_foild_child_CIs.RData")
 ```
 
 Attempt at getting the predictions and CI to the plot for agemonths ~ correct
