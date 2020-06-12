@@ -23,7 +23,7 @@ ls()#check whether workspace is empty
 
 #setwd("C:/Users/Zeynep/Desktop/ripped-foil/Ripped Foil")
 ripchild<-read.csv("ripped_child.csv", header=T)
-
+load("ripped_foil_child_CIs.RData")
 #all the libraries necessary to run the analyses
 library(lme4)
 library(readr)
@@ -242,71 +242,55 @@ full.CI=glmer(correct ~ z.trialno+order3.transfer.c+trialtype.sticker.c+agemonth
 Getting confidence intervals for fitted values
 
 ```{r}
-boot.res=boot.glmm.pred(model.res=full.CI, excl.warnings=T, nboots=100, resol=68, level=0.95, use="agemonths", n.cores="all-1", para=T)#with para=T your computer will get very slow so I recommend using this option particularly when you don't need to work with the PC in parallel (the CI calculation will be a lot faster though)
+boot.res=boot.glmm.pred(model.res=full.CI, excl.warnings=T, nboots=1000, resol=68, level=0.95, use="agemonths", n.cores="all-1", para=T)#with para=T your computer will get very slow so I recommend using this option particularly when you don't need to work with the PC in parallel (the CI calculation will be a lot faster though)
 
 boot.res$ci.estimates
-save.image("ripped_foild_child_CIs.RData")
+save.image("ripped_foil_child_CIs.RData")
 ```
-
-Attempt at getting the predictions and CI to the plot for agemonths ~ correct
-
-```{r}
-correctBYage<-ggplot(ripchild_individual, aes(agemonths, correct), ylim=c(0,1))
-s1<-correctBYage + geom_point(aes(), position="jitter") + labs(x= "Age in months", y= "Mean Performance in Test and Transfer")+ 
-  theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
-s1
-```
-
-
-
-
-
-```{r}
-#create sequence with agemonths against which lines should be plotted:
-plot.agemonths=seq(from=min(ripchild_individual$agemonths), to=max(ripchild_individual$agemonths), length.out=68)
-plot.agemonths
-
-```
-
-
-```{r}
-#there are 68 different data points (agemonths) and the argument resol of the function boot.glmm.pred was set to this value
-lines(plot.agemonths, boot.res$ci.predicted$fitted, lty=2)
-lines(plot.agemonths, boot.res$ci.predicted$lower.cl, lty=3)
-lines(plot.agemonths, boot.res$ci.predicted$upper.cl, lty=3)
-```
-
 
 For the geom_point plot - go over this before running.
 
 ```{r}
+#there are 68 different data points (agemonths) and the argument resol of the function boot.glmm.pred was set to this value
+#create sequence with agemonths against which lines should be plotted:
+
 plot.agemonths=seq(from=min(ripchild_individual$agemonths), to=max(ripchild_individual$agemonths), length.out=68)
 plot.agemonths
 
-lines(plot.agemonths, boot.res$ci.predicted$fitted, lty=2)
-lines(plot.agemonths, boot.res$ci.predicted$lower.cl, lty=3)
-lines(plot.agemonths, boot.res$ci.predicted$upper.cl, lty=3)
+scatter<-ggplot(ripchild_individual, aes(x=plot.agemonths, y=boot.res$ci.predicted$fitted)) +
+  geom_jitter(aes(x=agemonths, y=correct))+ geom_ribbon(data=boot.res$ci.predicted, aes(x =plot.agemonths,ymin=boot.res$ci.predicted$lower.cl,ymax=boot.res$ci.predicted$upper.cl), fill="grey", alpha=0.5)+
+  geom_line(data=boot.res$ci.predicted, aes(x = plot.agemonths,y=boot.res$ci.predicted$fitted), lty=2)+
+  theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ xlab("Age in months")+ ylab("Mean correct responses")+ xlim(36,72)+ylim(0,1)+
+  geom_hline(yintercept=0.50, color='red', linetype="dashed")
 
-ggplot(ripchild_individual, aes(x=plot.agemonths, y=boot.res$ci.predicted$fitted)) +
-  geom_jitter(aes(x=agemonths, y=correct))+
-  geom_ribbon(data=boot.res$ci.predicted, aes(x = plot.agemonths, ymin=boot.res$ci.predicted$lower.cl,
-                                              ymax=boot.res$ci.predicted$upper.cl), fill="grey", alpha=0.5)+
-  geom_line(data=boot.res$ci.predicted, aes(x = plot.agemonths, y=boot.res$ci.predicted$fitted), lty=2)+
-  theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
-  xlab("Age in months")+
-  ylab("Mean correct responses")+
-  xlim(36,72)
+scatter
 
 
+```
 
 
-
-Next things to do: Find effect sizes for the full model- calculation at Roger
-There was no effect of phase so don't look for the first trial of transfer anymore. If yes, table from Manuel's paper with number of kids who got trial 1 right and the p's from binom.
+Running a new model for calculating CIs for the interaction model
 
 ```{r}
-plot_model(full2, type="est") 
+full.CI.int<-glmer(correct ~ trialtype.sticker.c*order3.transfer.c+agemonths*order3.transfer.c+sex.m.c+z.trialno+(1|id)+(0+z.trialno+order3.transfer.c+trialtype.sticker.c|id),data=ripchild, family=binomial, control=contr)
+
 ```
+
+Getting the CIs for the interaction model
+
+```{r}
+boot.res.int=boot.glmm.pred(model.res=full.CI.int, excl.warnings=T, nboots=1000, resol=136, level=0.95, use="agemonths", n.cores="all-1", para=T) #resol=136 this time because data is aggregated for test and transfer separately.
+boot.res.int$ci.estimates
+save.image("ripped_foil_child_CIs_interaction.RData")
+```
+
+
+#Next things to do: 
+Run the scatter plot  for the interaction.
+Find effect sizes for the full model- calculation at Roger.
+Model assumptions
+First trial analysis of Transfer(The table from Manuel's paper with number of kids who got trial 1 right and the p's from binom.)
+
 
 Model assumptions
 
