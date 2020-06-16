@@ -291,6 +291,52 @@ Find effect sizes for the full model- calculation at Roger.
 Model assumptions
 First trial analysis of Transfer(The table from Manuel's paper with number of kids who got trial 1 right and the p's from binom.)
 
+Getting the data for the first trial of Transfer
+
+```{r}
+ripchild_1st_trial <- ripchild %>%
+  filter(order3=="transfer" & trialno=="1") %>%
+  group_by(id, age, agemonths, sex, trialtype, z.age, trialtype.sticker.c) %>% 
+  summarize(correct)
+```
+
+Trial 1 success in Transfer
+
+```{r}
+firsttrial <- glm(correct~agemonths,data=ripchild_1st_trial,family=binomial(link = "logit"))
+summary(firsttrial)
+
+newdat <- data.frame(agemonths=seq(min(ripchild_1st_trial$agemonths), max(ripchild_1st_trial$agemonths),len=68))
+newdat$correct = predict(firsttrial, newdata=newdat, type="response")
+
+
+
+```
+
+
+```{r}
+plot(correct~agemonths, data=ripchild_1st_trial)
+lines(correct~agemonths, newdat, col="blue", lwd=2)
+#taken from: https://stackoverflow.com/questions/36685921/plot-logistic-regression-curve-in-r/36686468
+```
+
+```{r}
+#how about ggplot
+ggplot(ripchild_1st_trial, aes(x=agemonths, y=correct)) + geom_point() + 
+  stat_smooth(method="glm", fullrange = TRUE, method.args=list(family="binomial"))+ylab("First trial performance of Transfer Phase")+xlab("Age in months")+xlim(36,72)
+#add abline to this
+```
+
+
+
+```{r}
+
+
+#write_csv(mtcars, path = "mtcars.csv") <- to save the data in csv
+```
+
+
+
 
 Model assumptions
 
