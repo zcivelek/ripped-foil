@@ -2,7 +2,9 @@
 title: "Main Analysis"
 author: "Lakens"
 date: "17 juni 2018"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r global_options, echo=FALSE, warning=FALSE, message=FALSE, include=FALSE}
@@ -18,9 +20,8 @@ Here, we analyze a simple dataset of a Stroop experiment. Students in an introdu
 
 ```{r}
 # #run only once to download the data
-# stroop_data <- read.table("https://raw.githubusercontent.com/Lakens/Stroop/master/stroop.txt", sep = "\t", header = TRUE)
-# 
-# write.table(stroop_data, file = "stroop.csv", quote=F, row.names=F)
+stroop_data <- read.table("https://raw.githubusercontent.com/Lakens/Stroop/master/stroop.txt", sep = "\t", header = TRUE) 
+write.table(stroop_data, file = "stroop.csv", quote=F, row.names=F)
 
 stroop_data <- read.csv("stroop.csv", sep = " ", header = TRUE)
 
@@ -48,9 +49,6 @@ ggplot(stroop_data, aes(x=Congruent, y=Incongruent)) +
 
 ```
 
-#Results
-
-The mean reaction time (in seconds) of participants in the Congruent condition (*M* = `r round(mean(stroop_data$Congruent), digits = 2)`, *SD* = `r round(sd(stroop_data$Congruent), digits = 2)`)  was lower than the mean of participants in the Incongruent condition (*M* = `r round(mean(stroop_data$Incongruent), digits = 2)`, *SD* = `r round(sd(stroop_data$Incongruent), digits = 2)`, *r* = `r round(cor(stroop_data$Congruent, stroop_data$Incongruent), digits = 2)`). An independent *t*-test indicated we could reject the null-hypothesis, based on an alpha of 0.05, *t*(`r round(ttest_result$parameter, digits=2)`) = `r round(ttest_result$statistic, digits=2)`, *p* `r ifelse(ttest_result$p.value > 0.001," = ", " < ")` `r ifelse(ttest_result$p.value > 0.001, formatC(round(ttest_result$p.value, digits=3), digits=3, format="f"), "0.001")`. As we can expect from the Stroop effect, the standardized effect size is very large, Hedges' *g~av~* = `r round(d_unb, digits=2)`, 95% CI [`r round(ci_l_d_av, digits=2)`;`r round(ci_u_d_av, digits=2)`]. 
 
 
 
