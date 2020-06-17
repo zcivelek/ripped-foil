@@ -23,7 +23,6 @@ ls()#check whether workspace is empty
 
 #setwd("C:/Users/Zeynep/Desktop/ripped-foil/Ripped Foil")
 ripchild<-read.csv("ripped_child.csv", header=T)
-load("ripped_foil_child_CIs.RData")
 #all the libraries necessary to run the analyses
 library(lme4)
 library(readr)
@@ -111,6 +110,7 @@ ripchild$z.age=as.vector(scale(ripchild$agemonths))
 
 ripchild$trialtype<-relevel(ripchild$trialtype, ref = "pen")
 summary(ripchild)
+
 ```
 
 ```{r}
@@ -263,13 +263,12 @@ ripchild_individual2 <- ripchild %>%
   group_by(z.age)%>%
     add_count(correct)
 
+plot.agemonths=seq(from=min(ripchild_individual2$z.age), to=max(ripchild_individual2$z.age),length.out=68)
 
 scatter<-ggplot(ripchild_individual2, aes(x=plot.agemonths, y=boot.res$ci.predicted$fitted)) +
-  geom_point(aes(x=z.age, y=correct), size=ripchild_individual2$n, alpha=0.8)+
-  geom_ribbon(data=boot.res$ci.predicted, aes(x =z.age,ymin=boot.res$ci.predicted$lower.cl,ymax=boot.res$ci.predicted$upper.cl), fill="grey", alpha=0.5)+
+  geom_point(aes(x=z.age, y=correct), size=ripchild_individual2$n, alpha=0.8)+ geom_ribbon(data=boot.res$ci.predicted, aes(x =z.age,ymin=boot.res$ci.predicted$lower.cl,ymax=boot.res$ci.predicted$upper.cl), fill="grey", alpha=0.5)+
   geom_line(data=boot.res$ci.predicted, aes(x = z.age,y=boot.res$ci.predicted$fitted), lty=2)+
   theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ xlab("Age in months")+ ylab("Mean correct responses")+ 
-  #xlim(36,72)+
   ylim(0,1)+
   geom_hline(yintercept=0.50, color='red', linetype="dashed")
 
@@ -277,6 +276,60 @@ scatter
 
 
 ```
+
+
+```{r}
+#trying Roger's plot
+plot.agemonths=seq(from=min(ripchild_individual2$z.age),to=max(ripchild_individual2$z.age),length.out=68)
+plot(plot.agemonths)
+lines(x=plot.agemonths, y=boot.res$ci.predicted$fitted,lty=2)
+lines(x=plot.agemonths, y=boot.res$ci.predicted$lower.cl,lty=3)
+lines(x=plot.agemonts, y=boot.res$ci.predicted$upper.cl,lty=3)
+?lines()
+```
+
+```{r}
+#trying something else
+attributes(boot.res$ci.predicted$z.age)
+install.packages("DMwR")
+library(DMwR)
+unsc.zage <- unscale(boot.res$ci.predicted, boot.res$ci.predicted$z.age)
+
+#didn't work. another attempt
+unscale <- function(z, center = attr(z, "scaled:center"), scale = attr(z, "scaled:scale")) 
+  {if(!is.null(scale))  z <- sweep(z, 2, scale, `*`)
+  if(!is.null(center)) z <- sweep(z, 2, center, `+`)
+  structure(z,
+    "scaled:center"   = NULL,
+    "scaled:scale"    = NULL,
+    "unscaled:center" = center,
+    "unscaled:scale"  = scale)}
+unscale(boot.res$ci.predicted$z.age)
+
+#another attempt!!!
+
+age.orig = t(lapply(boot.res$ci.predicted$z.age, function(r)r*attr(boot.res$ci.predicted$z.age,'scaled:scale') + attr(boot.res$ci.predicted$z.age, 'scaled:center')))
+
+# another attempt
+
+boot.res$ci.predicted$z.age * attr(boot.res$ci.predicted$z.age, 'scaled:scale') + attr(boot.res$ci.predicted$z.age, 'scaled:center')
+
+#another attempt
+
+unnormalize <- function(x, rec, var) {
+  var_sd <- extract_step_item(rec, "step_normalize", "sds") %>% dplyr::pull(var)
+  var_mean <- extract_step_item(rec, "step_normalize", "means") %>% dplyr::pull(var)
+
+  (x * var_sd) + var_mean}
+unnormalize(boot.res$ci.predicted,boot.res$ci.predicted$z.age)
+
+boot.res$ci.predicted
+
+#last attempt
+ripchild_individual2$z.age * attr(ripchild_individual2$z.age, 'scaled:scale') + attr(ripchild_individual2$z.age, 'scaled:center')
+
+```
+
 
 
 Running a new model for calculating CIs for the interaction model
@@ -293,7 +346,36 @@ Getting the CIs for the interaction model
 
 boot.res.int=boot.glmm.pred(model.res=full.CI.int, excl.warnings=T, nboots=1000, resol=136, level=0.95, use="order3.transfer", n.cores="all-1", para=T) #resol=136 this time because data is aggregated for test and transfer separately.
 boot.res.int$ci.estimates
+boot.res.int$ci.predicted
+
 save.image("ripped_foil_child_CIs_interaction.RData")
+load("ripped_foil_child_CIs_interaction.RData")
+```
+
+
+
+```{r}
+ripchild_separate2 <- ripchild %>%
+  group_by(id,  z.age, order3) %>% 
+  summarize(correct= mean(correct))%>%
+  ungroup()%>%
+  group_by(z.age, order3)%>%
+    add_count(correct)
+
+
+scatter.int<-ggplot(ripchild_separate2, aes(x=z.age, y=boot.res.int$ci.predicted$fitted)) +
+  facet_wrap(~order3, nrow = 2)+
+  geom_point(aes(x=z.age, y=correct, fill=order3))
+  
+scatter.int
+
+#up to here it works... I need to find a way to add confidence intervals separately to two plots.
+#the rest of the code: geom_ribbon(data=boot.res.int$ci.predicted, aes(x =z.age,ymin=boot.res.int$ci.predicted$lower.cl,ymax=boot.res.int$ci.predicted$upper.cl), fill="grey", alpha=0.5)+
+  geom_line(data=boot.res.int$ci.predicted, aes(x = z.age,y=boot.res.int$ci.predicted$fitted), lty=2)+
+  theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ xlab("Age in months")+ ylab("Mean correct responses in Test and Transfer")+ 
+  #xlim(36,72)+
+  ylim(0,1)+
+  geom_hline(yintercept=0.50, color='red', linetype="dashed")
 
 ```
 
