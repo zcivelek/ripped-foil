@@ -301,7 +301,7 @@ abline(h = 0.5, col="red", lwd=3, lty=2)
 Running a new model for calculating CIs for the interaction model
 
 ```{r}
-full.CI.int<-glmer(correct ~ trialtype.sticker.c+z.age*order3.transfer+sex.m.c+z.trialno+(1|id)+(0+z.trialno+order3.transfer.c+trialtype.sticker.c|id),data=ripchild, family=binomial, control=contr)
+full.CI.int<-glmer(correct ~ trialtype.sticker.c+z.age*order3+sex.m.c+z.trialno+(1|id)+(0+z.trialno+order3.transfer.c+trialtype.sticker.c|id),data=ripchild, family=binomial, control=contr)
 
 ```
 
