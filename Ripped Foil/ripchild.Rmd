@@ -310,22 +310,22 @@ Getting the CIs for the interaction model
 ```{r}
 
 
-boot.res.int=boot.glmm.pred(model.res=full.CI.int, excl.warnings=T, nboots=1000, resol=136, level=0.95, use="order3.transfer", n.cores="all-1", para=T) #resol=136 this time because data is aggregated for test and transfer separately.
+boot.res.int=boot.glmm.pred(model.res=full.CI.int, excl.warnings=T, nboots=1000, resol=136, level=0.95, use="z.age", n.cores="all-1", para=T) #resol=136 this time because data is aggregated for test and transfer separately.
 boot.res.int$ci.estimates
 boot.res.int$ci.predicted
 
 save.image("ripped_foil_child_CIs_interaction.RData")
-load("ripped_foil_child_CIs_interaction.RData")
+#load("ripped_foil_child_CIs_interaction.RData")
 ```
 
 
 
 ```{r}
 ripchild_separate <- ripchild %>%
-  group_by(id,  agemonths, order3) %>% 
+  group_by(id,  z.age, order3) %>% 
   summarize(correct= mean(correct))%>%
   ungroup()%>%
-  group_by(agemonths, order3)%>%
+  group_by(z.age, order3)%>%
     add_count(correct)
 
 plot.int=seq(from=min(ripchild_separate$agemonths), to=max(ripchild_separate$agemonths),
@@ -341,8 +341,8 @@ theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = elemen
 
 scatter
 
-scatter.int<-ggplot(ripchild_separate, aes(x=plot.int, y=boot.res.int$ci.predicted$fitted)) +
- geom_point(aes(x=agemonths, y=correct), size=ripchild_separate$n, alpha=0.8) +    facet_wrap(~order3)+
+scatter.int<-ggplot(ripchild_separate, aes(x=boot.res.int$ci.predicted$z.age, y=boot.res.int$ci.predicted$fitted)) +
+ geom_point(aes(x=z.age, y=correct), size=ripchild_separate$n, alpha=0.8) +    facet_wrap(~order3)+
 geom_ribbon(data=boot.res.int$ci.predicted, aes(y=boot.res.int$ci.predicted$fitted, ymin=boot.res.int$ci.predicted$lower.cl, ymax=boot.res.int$ci.predicted$upper.cl), fill="grey", alpha=0.5)+geom_line(data=boot.res.int$ci.predicted, aes(y=boot.res.int$ci.predicted$fitted), lty=2)+
   theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ xlab("Age in months")+
   ylim(0,1)+
