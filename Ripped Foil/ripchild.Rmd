@@ -68,10 +68,6 @@ ripchild_individual <- ripchild %>%
   group_by(agemonths)%>%
     add_count(correct)
 
-ripchild_separate <- ripchild %>%
-  group_by(order3, id, age, agemonths) %>% 
-  summarize(correct = mean(correct)) 
-
 ripchild_test <- ripchild %>%
   filter(order3=="test") %>%
   group_by(id, age, agemonths) %>% 
@@ -266,6 +262,9 @@ ripchild_individual2 <- ripchild %>%
   group_by(z.age)%>%
     add_count(correct)
 
+plot.xvals=seq(from=min(ripchild_individual$agemonths), to=max(ripchild_individual$agemonths),
+length.out=68)
+
 ##using ggplot but using the values from ripchild_individual instead)
 
 scatter<-ggplot(ripchild_individual, aes(x=plot.xvals, y=boot.res$ci.predicted$fitted)) + geom_point(aes(x=agemonths, y=correct), size=ripchild_individual$n, alpha=0.8)+
@@ -286,8 +285,7 @@ par(mar=c(3, 3, 0.2, 0.2), mgp=c(1.7, 0.3, 0), las=1, tcl=-0.15)
 plot(x=ripchild_individual$agemonths, y=ripchild_individual$correct, pch=19, las=2, ylim=c(0, 1),
 xlab="Age in months", ylab="Mean correct responses")
 
-plot.xvals=seq(from=min(ripchild_individual$agemonths), to=max(ripchild_individual$agemonths),
-length.out=68)
+plot.xvals=seq(from=min(ripchild_individual$agemonths), to=max(ripchild_individual$agemonths),length.out=68)
 
 lines(x=plot.xvals, y=boot.res$ci.predicted$fitted,
 lty=2)
@@ -331,20 +329,10 @@ ripchild_separate <- ripchild %>%
 plot.int=seq(from=min(ripchild_separate$agemonths), to=max(ripchild_separate$agemonths),
 length.out=136)
 
-
-scatter<-ggplot(ripchild_individual, aes(x=plot.xvals, y=boot.res$ci.predicted$fitted)) + geom_point(aes(x=agemonths, y=correct), size=ripchild_individual$n, alpha=0.8)+
-geom_ribbon(data=boot.res$ci.predicted, aes(x=plot.xvals,ymin=boot.res$ci.predicted$lower.cl,ymax=boot.res$ci.predicted$upper.cl), fill="grey", alpha=0.5)+
-geom_line(data=boot.res$ci.predicted, aes(x = plot.xvals,y=boot.res$ci.predicted$fitted), lty=2)+
-theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ xlab("Age in months")+ ylab("Mean correct responses")+ 
-  ylim(0,1)+
-  geom_hline(yintercept=0.50, color='red', linetype="dashed")
-
-scatter
-
 scatter.int<-ggplot(ripchild_separate, aes(x=boot.res.int$ci.predicted$z.age, y=boot.res.int$ci.predicted$fitted)) +
  geom_point(aes(x=z.age, y=correct), size=ripchild_separate$n, alpha=0.8) +    facet_wrap(~order3)+
 geom_ribbon(data=boot.res.int$ci.predicted, aes(y=boot.res.int$ci.predicted$fitted, ymin=boot.res.int$ci.predicted$lower.cl, ymax=boot.res.int$ci.predicted$upper.cl), fill="grey", alpha=0.5)+geom_line(data=boot.res.int$ci.predicted, aes(y=boot.res.int$ci.predicted$fitted), lty=2)+
-  theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ xlab("Age in months")+
+  theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ xlab("Age in months")+ ylab("Mean correct responses")+ 
   ylim(0,1)+
   geom_hline(yintercept=0.50, color='red', linetype="dashed")
   
@@ -352,6 +340,30 @@ geom_ribbon(data=boot.res.int$ci.predicted, aes(y=boot.res.int$ci.predicted$fitt
   
 
 ```
+
+
+```{r}
+
+#do the same scatter plot for interaction with age not z-tranformed so the graph is more informative.
+ripchild_separate2 <- ripchild %>%
+  group_by(id,  agemonths, order3) %>% 
+  summarize(correct= mean(correct))%>%
+  ungroup()%>%
+  group_by(agemonths, order3)%>%
+    add_count(correct)
+
+plot.int=seq(from=min(ripchild_separate2$agemonths), to=max(ripchild_separate2$agemonths),
+length.out=272)
+
+scatter.int2<-ggplot(ripchild_separate2, aes(x=plot.int, y=boot.res.int$ci.predicted$fitted, group=order3)) +
+ geom_point(aes(x=agemonths, y=correct), size=ripchild_separate2$n, alpha=0.8) +    facet_wrap(~order3) + geom_ribbon(data=boot.res.int$ci.predicted, aes(x=plot.int, y=boot.res.int$ci.predicted$fitted, ymin=boot.res.int$ci.predicted$lower.cl, ymax=boot.res.int$ci.predicted$upper.cl, group=boot.res.int$ci.predicted$order3),fill="grey", alpha=0.5) + geom_line(data=boot.res.int$ci.predicted, aes(y=boot.res.int$ci.predicted$fitted), lty=2)+
+  theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ xlab("Age in months")+ ylab("Mean correct responses")+ 
+  ylim(0,1)+
+  geom_hline(yintercept=0.50, color='red', linetype="dashed")
+  
+  scatter.int2
+```
+
 
 
 #Next things to do: 
