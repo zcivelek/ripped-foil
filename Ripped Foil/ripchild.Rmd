@@ -8,7 +8,7 @@ output: word_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo=FALSE, warning=FALSE, message=FALSE, include=TRUE)
 
-#This sets general options for the code chunks in the R Markdown file. The echo, warning, and message = FALSE hide the code chunks, warning messages, and other messages, where the ‘include=true’ will make all figures appear in the text. You can set some of these variables to TRUE, and hit Knit to see what they change. Sometimes you might want to share the HTML file with all code visible, for example when sharing with collaborators. 
+#This sets general options for the code chunks in the R Markdown file. The echo, warning, and message = FALSE hide the code chunks, warning messages, and other messages, where the ‘include=true’ will make all figures appear in the text. You can set some of these variables to TRUE, and hit Knit to see what they change. 
 ```
 
 ```{r}
@@ -46,12 +46,11 @@ ripchild$age <- as.factor(ripchild$age)# makes continuous variables categorical
 ripchild$id<-as.factor(ripchild$id)
 ripchild$sex<-as.factor(ripchild$sex)
 
-levels(ripchild$agecat)
 str(ripchild)
 
 ```
 
-We decided to use age as a continuous variable (age in months) in our main analyses rather than categorical to have more power.
+We decided to use age as a continuous variable (age in months) in our main analyses rather than categorical to have more power.The distribution of age:
 
 ```{r pressure, echo=FALSE}
 hist(ripchild$agemonths, xlab="Age in months (36-72)", ylab="Frequency")
@@ -79,7 +78,9 @@ ripchild_transfer <- ripchild %>%
   summarize(correct = mean(correct)) 
 
 ```
+
 Histograms for Test and Transfer
+
 ```{r}
 hist(ripchild_test$correct, xlab="Mean score in Test", xlim=c(0,1))
 hist(ripchild_transfer$correct, xlab="Mean score in Transfer", xlim=c(0,1))
@@ -99,8 +100,8 @@ shapiro.test(ripchild_transfer$correct)
 
 The Shapiro-Wilk normality tests confirm that the data are not normally distributed for Test and Transfer phases (neither for an overall score).
 
-
-```{r, echo=TRUE}
+Below is the how children in different ages perform in test and transfer.
+```{r}
 testBYage<-ggplot(ripchild_test, aes(agemonths, correct))
 s1<-testBYage + geom_point(aes(), position="jitter") + labs(x= "Age in months", y= "Mean Performance in Test")+ 
   geom_smooth(method ="lm", alpha=0.2)+
@@ -118,7 +119,7 @@ The regression line (with a 95% CI) for the Transfer phase is steeper than the T
 
 
 
-Next is the pre-processing of data (z-transformations for 'trial no' and 'age in months'; checking if factors are correctly identified, coding dummy variables for trialtype, sex and phase (order3), and finally centering the random slope components for these variables.
+Next is the pre-processing of data: z-transformations for 'trial no' and 'age in months', coding dummy variables for trialtype, sex and phase (order3), and finally centering the random slope components for these variables.
 
 ```{r}
 #Preprocessing of data, Z-transforming trial no and age
@@ -151,9 +152,11 @@ source("./Roger_functions/boot_glmm.r")
 ```
 
 
-Guide on how to decide on the model...
 
 ```{r}
+
+# Guide on how to decide on the model...
+
 xx.fe.re=fe.re.tab(fe.model="correct  ~
                   trialtype*order3+trialno+
                    z.age*order3+sex",
@@ -164,13 +167,15 @@ ydata=xx.fe.re$data
 ```
 
 
-Full model - does not include box type anymore
+Full model
 
 ```{r}
 contr<-glmerControl(optimizer="bobyqa", optCtrl=list(maxfun=10000000))
 full<-glmer(correct ~ trialtype*order3+z.trialno+z.age*order3+sex+(1|id)+(0+z.trialno+order3.transfer.c+trialtype.sticker.c|id),data=ripchild, family=binomial, control=contr)
 
 ```
+
+The full model does not include box type (the location of the blue/pink box) as a random effect anymore due to convergence issues.
 
 Model assumptions
 
@@ -287,7 +292,6 @@ round(xdrop1,3)
 ```
 
 Age emerges as a significant predictor of scores.
-
 
 ```{r}
 # this is for me to check the variance added by random effects, number of observations and subjects etc.
@@ -438,11 +442,6 @@ scatter.int2<-ggplot(ripchild_separate2, aes(x=plot.int, y=boot.res.int$ci.predi
 ```
 
 
-
-#Next things to do: 
-Find effect sizes for the full model- calculation at Roger.
-First trial analysis of Transfer(The table from Manuel's paper with number of kids who got trial 1 right and the p's from binom.)
-
 Getting the data for the first trial of Transfer
 
 ```{r}
@@ -455,34 +454,22 @@ ripchild_1st_trial <- ripchild %>%
 Trial 1 success in Transfer
 
 ```{r}
-firsttrial <- glm(correct~agemonths,data=ripchild_1st_trial,family=binomial(link = "logit"))
+firsttrial <- glm(correct~agemonths+sex+trialtype,data=ripchild_1st_trial,family=binomial(link = "logit"))
 summary(firsttrial)
 
-newdat <- data.frame(agemonths=seq(min(ripchild_1st_trial$agemonths), max(ripchild_1st_trial$agemonths),len=68))
-newdat$correct = predict(firsttrial, newdata=newdat, type="response")
-
-
-
 ```
+Age is a significant predictor of first trial performance of Transfer.
 
-
-```{r}
-plot(correct~agemonths, data=ripchild_1st_trial)
-lines(correct~agemonths, newdat, col="blue", lwd=2)
-#taken from: https://stackoverflow.com/questions/36685921/plot-logistic-regression-curve-in-r/36686468
-```
 
 ```{r}
 #how about ggplot
 ggplot(ripchild_1st_trial, aes(x=agemonths, y=correct)) + geom_point() + 
-  stat_smooth(method="glm", fullrange = TRUE, method.args=list(family="binomial"))+ylab("First trial performance of Transfer Phase")+xlab("Age in months")+xlim(36,72)
-#add abline to this
+  stat_smooth(method="glm", fullrange = TRUE, lty=2, size=0.5, colour="Black", alpha=0.2,  method.args=list(family="binomial"))+ylab("First trial performance of Transfer Phase")+xlab("Age in months")+xlim(36,72)+theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 ```
 
 
 
 
-If I wanted to look at children's performances in Test and Transfer phases across agemonths.(but this is not necessary anymore!)
 
 
 
