@@ -301,13 +301,23 @@ print(summary(full2), corr=FALSE)
 Confidence intervals for the reduced model without the interaction
 
 ```{r}
-model2CI=boot.glmm.pred(model.res=full2, excl.warnings=T, nboots=1000, para=T)
-round(model2CI$ci.estimates, 3)
-save.image("model2_CIs.RData")
+# model2CI=boot.glmm.pred(model.res=full2, excl.warnings=T, nboots=1000, para=T)
+# round(model2CI$ci.estimates, 3)
+# save.image("model2_CIs.RData")
 load("model2_CIs.RData")
 ```
 
- Running a separate model for the CI calculation. Age is entered as age in months (notz transformed).
+Calculating effect sizes for the final model
+
+```{r}
+#install.packages("MuMIn")
+library("MuMIn")
+r.squaredGLMM(object=full2)
+
+#as I’m not very passionate about effect sizes, I don’t go into detail here. the (marginal and conditional) effect sizes in the row headed delta are the ones according to a recent paper (Nakagawa et al., 2017) which you should report. Marginal R-squared is the variance explained by the fixed effects. The conditional R-squared is the variance explained by the fixed and random effects (the model)
+```
+
+Running a separate model for the CI calculation. Age is entered as age in months (notz transformed).
 
 ```{r}
 #running a new model for CI predictions
