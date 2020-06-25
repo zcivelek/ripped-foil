@@ -1,0 +1,99 @@
+---
+title: "Ripped Foil - Monkeys"
+author: "Zeynep Civelek"
+date: "June 25, 2020"
+output: word_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, warning=FALSE, message=FALSE, include=TRUE)
+
+#This sets general options for the code chunks in the R Markdown file. The echo, warning, and message = FALSE hide the code chunks, warning messages, and other messages, where the ‘include=true’ will make all figures appear in the text. You can set some of these variables to TRUE, and hit Knit to see what they change. 
+```
+
+```{r}
+#PREPARE
+R.Version()#for referencing, shows you which R version you are using
+rm(list=ls())#removes any other items in your workspace
+ls()#check whether workspace is empty
+```
+
+```{r}
+#Directory is set, data is added and all the libraries necessary for running the analyses are loaded.
+
+ripmon1<-read.csv("ripped_monkey_test16.csv", header=T)
+setwd("C:/Users/Zeynep/Desktop/ripped-foil/Ripped Foil")
+# ripchild<-read.csv("ripped_child.csv", header=T)
+#all the libraries necessary to run the analyses
+library(lme4)
+library(readr)
+library(tidyverse)
+library(sjPlot)
+#install.packages('TMB', type='source')
+library(ggthemes)
+library(gridExtra)
+library(reshape2)
+library(car)
+#library(psych)
+library("ggpubr")
+library(dplyr)
+
+```
+
+The structure of the data is shown below with all the variable names and levels of measurement.
+
+```{r}
+ripmon1$id<-as.factor(ripmon1$id)
+ripmon1$sex<-as.factor(ripmon1$sex)
+ripmon1$phase2<-as.factor(ripmon1$phase2)
+
+str(ripmon1)
+
+```
+
+I aggregated the trial-by-trial data to create one score per monkey for Test and Transfer phases so I can check whether they are normally distributed or not.
+
+```{r}
+ripmon_individual <- ripmon1 %>%
+  filter(!is.na(correct)) %>%
+  group_by(id) %>% 
+  summarize(correct = mean(correct))%>%
+  add_count(correct)
+
+ripmon_test <- ripmon1 %>%
+   filter(!is.na(correct)) %>%
+  filter(phase=="test") %>%
+  group_by(id) %>% 
+  summarize(correct = mean(correct))%>%
+  add_count(correct)
+
+ripmon_transfer <- ripmon1 %>%
+   filter(!is.na(correct)) %>%
+  filter(phase=="transfer") %>%
+  group_by(id) %>% 
+  summarize(correct = mean(correct))%>%
+  add_count(correct)
+
+```
+
+Histograms for Test and Transfer
+
+```{r}
+hist(ripmon_test$correct, xlab="Mean score in Test", xlim=c(0,1))
+hist(ripmon_transfer$correct, xlab="Mean score in Transfer", xlim=c(0,1))
+hist(ripmon_individual$correct, xlab="Overall score (Test and Transfer)", xlim=c(0,1))
+```
+
+```{r}
+
+shapiro.test(ripmon_individual$correct)
+
+shapiro.test(ripmon_test$correct)
+
+shapiro.test(ripmon_transfer$correct)
+```
+The Shapiro-Wilk normality tests show that the data are normally distributed for Test and Transfer phases (as well as the overall scores per individual).
+
+
+
+
+
