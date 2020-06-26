@@ -73,6 +73,13 @@ ripmon_transfer <- ripmon1 %>%
   summarize(correct = mean(correct))%>%
   add_count(correct)
 
+
+ripmon_separate <- ripmon1 %>%
+   filter(!is.na(correct)) %>%
+  group_by(id, phase,age) %>% 
+  summarize(correct = mean(correct))%>%
+  add_count(correct)
+
 ```
 
 Histograms for Test and Transfer
@@ -93,7 +100,300 @@ shapiro.test(ripmon_transfer$correct)
 ```
 The Shapiro-Wilk normality tests show that the data are normally distributed for Test and Transfer phases (as well as the overall scores per individual).
 
+Below is how performance looks in the last 16 trials of Test and Transfer
+```{r}
+boxplot1 <- ggplot(ripmon_separate, aes(x=phase, y=correct)) + 
+    geom_dotplot(binaxis='y', stackdir='center', dotsize=0.5) + ylim(0,1)
+boxplot1 + stat_summary(fun.data="mean_sdl", fun.args = list(mult=1), geom="crossbar", width=0.5) + stat_summary(fun.y=mean, geom="point", color="red")+theme_bw() + stat_summary(fun.data=mean_sdl, fun.args = list(mult=1), 
+                 geom="pointrange", color="red")+ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+geom_hline(yintercept=0.50, color='red', linetype="dashed")+xlab("Phase") + ylab("Mean number of correct responses in 16 trials")
+```
+
+Next we preprocess the data; scaling age and trial number, coding categorical variables as dummy variables and centering the slopes.
+
+```{r}
+#We scale variables so that the differences in the range of the variables do not influence the parameter estimations.
+ripmon1$z.trialno<-as.vector(scale(ripmon1$trialno))
+ripmon1$z.age=as.vector(scale(ripmon1$age))
+ripmon1$trialtype<-relevel(ripmon1$trialtype, ref = "stick")
+
+#coding dummy variables before centering the slopes
+ripmon1$trialtype.food<-as.numeric(ripmon1$trialtype==levels(ripmon1$trialtype)[2])
+ripmon1$sex.m<-as.numeric(ripmon1$sex==levels(ripmon1$sex)[2])
+ripmon1$phase.transfer=as.numeric(ripmon1$phase==levels(ripmon1$phase)[2])
+
+#centering the slopes: p-values of the factors can be influenced by the choice of reference category.
+#by centering the factor for the random slope components the p-values should be the same irrespective of the choice of the reference level
+ripmon1$trialtype.food.c<-ripmon1$trialtype.food-mean(ripmon1$trialtype.food)
+ripmon1$phase.transfer.c=ripmon1$phase.transfer-mean(ripmon1$phase.transfer)
+ripmon1$sex.m.c<-ripmon1$sex.m -mean(ripmon1$sex.m)
+
+summary(ripmon1)
+```
+
+```{r}
+source("./Roger_functions/diagnostic_fcns.r")
+source("./Roger_functions/glmm_stability.r")
+source("./Roger_functions/boot_glmm.r")
+```
+
+```{r}
+
+# Guide on how to decide on the model...
+
+xx.fe.re=fe.re.tab(fe.model="correct  ~
+                  trialtype*phase+trialno+
+                   z.age+sex",
+                   re="(1|id)",
+                   data=data.frame(ripmon1))
+xx.fe.re$summary
+ydata=xx.fe.re$data
+```
+
+Full model (removed box location from random effects)
+
+```{r}
+contr<-glmerControl(optimizer="bobyqa", optCtrl=list(maxfun=10000000))
+full=glmer(correct ~ trialtype*phase+z.trialno+z.age+sex+(1+z.trialno+phase.transfer.c+trialtype.food.c|id),data=ripmon1, family=binomial, control=contr)
+```
+
+Model assumptions
+
+Distribution of random effects
+```{r}
+#An assumption of GLMMs is that the BLUPs are normally distributed. We use the following function to evaluate this. BLUPs are Best Linear Unbiased Predictors: the estimated grouping factor's level specific deviation from the common intercept or slope.
+ranef.diagn.plot(full)
+```
+
+Model stability
+
+```{r}
+#summary reveals min and max of the estimates obtained after casewise deletion of levels of random effects together with the original estimates.
+m.stab=glmm.model.stab(model.res=full, contr=contr)
+m.stab.plot(m.stab$summary[,-1])
+m.stab$summary
+m.stab$detailed$warnings
+```
+
+Multicollinearity
+
+```{r}
+coll=lm(correct ~ trialtype*phase+z.trialno+z.age+sex, data=ripmon1)
+round(vif(coll),3)
+#no vif issues
+```
+
+Overdispersion
+
+```{r}
+#overdispersion test
+overdisp.test(full)
+```
+
+Null model
+
+```{r}
+null=glmer(correct~(1+z.trialno+phase.transfer.c+trialtype.food.c|id),data=ripmon1, family=binomial, control=contr)
+```
+
+Question: I do have (1|id) as another random effect in the child model. Do I not need to include it here?
+
+Full and Null comparison
+```{r}
+round(anova(null, full, test="Chisq"),3)
+```
+
+Model output
+
+Coefficients
+
+```{r}
+round(summary(full)$coefficients, 3)
+```
+
+Individual predictor: Likelihood tests
+
+```{r}
+xdrop1=drop1(full, test="Chisq",control=contr)
+round(xdrop1,3)
+```
+
+Confidence intervals for the full model with the interaction
+
+```{r}
+# ripmon_model1=boot.glmm.pred(model.res=full, excl.warnings=T, nboots=1000, para=T)
+# round(ripmon_model1$ci.estimates, 3)
+# save.image("ripmon_model1_CIs.RData")
+load("ripmon_model1_CIs.RData")
+```
+
+The interaction term is not significant so I will remove it from the model.
+
+Reduced model without the interaction
+Full model 2
+
+```{r}
+full2=glmer(correct ~ trialtype+phase+z.trialno+z.age+sex+(1+z.trialno+phase.transfer.c+trialtype.food.c|id),data=ripmon1, family=binomial, control=contr)
+summary(full2)
+```
+
+I get the following warning: convergence code: 0, boundary (singular) fit: see ?isSingular.
+
+The results show that there is a significant effect of sex and trial type.
+
+Null model
+
+```{r}
+null<-glmer(correct~ (1+z.trialno+phase.transfer.c+trialtype.food.c|id),data=ripmon1, family=binomial, control=contr)
+```
+
+Full 2 and null comparision
+
+```{r}
+round(anova(null, full2, test="Chisq"),3)
+```
+
+####Model output
+  +Coefficients
+
+```{r echo=FALSE}
+round(summary(full2)$coefficients, 3)
+
+```
+
+  + Individual predictors : Likelihod ratio tests
+  
+  
+```{r echo=FALSE}
+xdrop1=drop1(full2, test="Chisq",control=contr)
+round(xdrop1,3)
+```
+
+```{r}
+# this is for me to check the variance added by random effects, number of observations and subjects etc.
+print(summary(full2), corr=FALSE)
+```
+
+Confidence intervals for the reduced model without the interaction
+
+```{r}
+# ripmon_model2=boot.glmm.pred(model.res=full2, excl.warnings=T, nboots=1000, para=T)
+# round(ripmon_model2$ci.estimates, 3)
+# save.image("ripmon_model2_CIs.RData")
+load("ripmon_model2_CIs.RData")
+```
+
+Calculating effect sizes for the final model
+
+```{r}
+#install.packages("MuMIn")
+library("MuMIn")
+r.squaredGLMM(object=full2)
+
+#the (marginal and conditional) effect sizes in the row headed delta are the ones according to a recent paper (Nakagawa et al., 2017) which you should report. Marginal R-squared is the variance explained by the fixed effects. The conditional R-squared is the variance explained by the fixed and random effects (the model)
+```
+
+Looking at the graph before running the analyses on the effect of sex and trial type
+
+```{r}
+ripmon_individual2<-ripmon1 %>% 
+  group_by(phase, id) %>% 
+  summarize(foil.correct = mean(correct)) %>% 
+  add_count(foil.correct)
+
+p1 <- ggplot(data=ripmon_individual2, aes(x=phase, y=foil.correct, group=phase)) + geom_boxplot()+ylim(0,1)+  geom_point(size = ripmon_individual2$n, colour = "darkgrey", alpha=0.3) +labs(x="",y="Mean number of correct choices")+theme_few()+ggtitle("Phase")+geom_hline(yintercept=0.5, linetype="dashed", color = "red")
+
+ripmon_individual3 <- ripmon1 %>% 
+  group_by(trialtype, id) %>% 
+  summarize(foil.correct = mean(correct)) %>% 
+  add_count(foil.correct)
+
+p2 <- ggplot(data=ripmon_individual3, aes(x=trialtype, y=foil.correct, group=trialtype)) +geom_boxplot()+ylim(0,1)+geom_point(size = ripmon_individual3$n, colour = "darkgrey", alpha=0.3) +geom_line(lty=2)+labs(x="",y="Mean number of correct choices")+ theme_few()+ggtitle("Trial type")+geom_hline(yintercept=0.5, linetype="dashed", color = "red")
+
+ripmon_individual4<-ripmon1 %>% 
+  group_by(sex, id) %>% 
+  summarize(foil.correct = mean(correct)) %>% 
+  add_count(foil.correct)
+
+p3 <- ggplot(data=ripmon_individual4, aes(x=sex, y=foil.correct, group=sex)) + geom_boxplot()+ylim(0,1)+ geom_point(size = ripmon_individual4$n, colour = "darkgrey", alpha=0.3) +labs(x="",y="Mean number of correct choices")+theme_few()+ggtitle("Sex")+geom_hline(yintercept=0.5, linetype="dashed", color = "red")
+
+grid.arrange(p1, p2, p3, nrow = 1, heights=unit(100, "mm"))
+```
+
+Performance in test and transfer with a bar graph.
+
+```{r}
+#Doing a bar graph
+
+ripaggregate <- aggregate(ripmon1$correct, by = list(order = ripmon1$order, phase = ripmon1$phase), function(x) c(mean = mean(x), sd = sd(x), n = length(x)))
+ripaggregate <- do.call(data.frame, ripaggregate)
+ripaggregate$se <- ripaggregate$x.sd / sqrt(ripaggregate$x.n)
+
+colnames(ripaggregate) <- c("order", "phase", "mean", "sd", "n", "se")
+
+ripaggregate$names <- c(paste(ripaggregate$order, "order",
+                              ripaggregate$phase, "phase"))
+
+limits <- aes(ymax = ripaggregate$mean + ripaggregate$se,
+              ymin = ripaggregate$mean - ripaggregate$se)
+p <- ggplot(data = ripaggregate, aes(x = factor(order), y = mean, fill = factor(phase)))
+p + geom_bar(stat = "identity", position = position_dodge(0.9), width = 0.8) + geom_errorbar(limits, position = position_dodge(0.9), width = 0.10) + labs(x= "", y = "Mean correct responses") + ggtitle("Performance in test and transfer phases by trial type") + scale_fill_grey(name = "Phase") + geom_hline(yintercept=0.50, linetype="dashed", color="red", size=1)  + theme(legend.text = element_text(size = 8)) + ylim(0.00,1.00) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),panel.background = element_blank())
+
+```
+
+##Test against chance
+####Test and transfer phase
+```{r, echo=FALSE}
+ttest<-t.test(ripmon_separate$correct[ripmon_separate$phase=="test"] , mu=0.5, alternative = "two.sided")
+ttest
+ttransfer<-t.test(ripmon_separate$correct[ripmon_separate$phase=="transfer"] , mu=0.5, alternative = "two.sided")
+ttransfer
+```
+
+####Comparison between test and transfer phase
+
+```{r}
+comptt<-t.test(ripmon_separate$correct[ripmon_separate$phase=="test"], ripmon_separate$correct[ripmon_separate$phase=="transfer"], paired = TRUE, alternative = "two.sided")
+comptt
+```
+
+####Trial type
+
+```{r, echo=FALSE}
+ttypefood<-t.test(ripmon_individual3$foil.correct[ripmon_individual3$trialtype=="food"] , mu=0.5, alternative = "two.sided")
+ttypefood
+ttypestick<-t.test(ripmon_individual3$foil.correct[ripmon_individual3$trialtype=="stick"], mu=0.5, alternative="two.sided")
+ttypestick
+```
+
+####Comparison between food-stick, stick-food trials
+
+```{r}
+ttype<-t.test(ripmon_individual3$foil.correct[ripmon_individual3$trialtype=="food"], ripmon_individual3$foil.correct[ripmon_individual3$trialtype=="stick"], paired = TRUE, alternative = "two.sided")
+ttype
+```
+
+####Sex
+
+```{r}
+ttmale<-t.test(ripmon_individual4$foil.correct[ripmon_individual4$sex=="m"] , mu=0.5, alternative = "two.sided")
+ttmale
+ttfemale<-t.test(ripmon_individual4$foil.correct[ripmon_individual4$sex=="f"] , mu=0.5, alternative = "two.sided")
+ttfemale
+```
+####Comparison between males and females
+
+```{r}
+tsex<-t.test(ripmon_individual4$foil.correct[ripmon_individual4$sex=="m"], ripmon_individual4$foil.correct[ripmon_individual4$sex=="f"], paired = FALSE, alternative = "two.sided")
+tsex
+```
 
 
 
+
+####Comparison between test and transfer phase
+
+```{r}
+comptt<-t.test(ripmon_separate$correct[ripmon_separate$phase=="test"], ripmon_separate$correct[ripmon_separate$phase=="transfer"], paired = TRUE, alternative = "two.sided")
+comptt
+```
 
