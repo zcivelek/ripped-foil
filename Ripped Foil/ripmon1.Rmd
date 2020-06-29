@@ -21,7 +21,7 @@ ls()#check whether workspace is empty
 #Directory is set, data is added and all the libraries necessary for running the analyses are loaded.
 
 ripmon1<-read.csv("ripped_monkey_test16.csv", header=T)
-setwd("C:/Users/Zeynep/Desktop/ripped-foil/Ripped Foil")
+# setwd("C:/Users/Zeynep/Desktop/ripped-foil/Ripped Foil")
 # ripchild<-read.csv("ripped_child.csv", header=T)
 #all the libraries necessary to run the analyses
 library(lme4)
@@ -387,13 +387,51 @@ tsex<-t.test(ripmon_individual4$foil.correct[ripmon_individual4$sex=="m"], ripmo
 tsex
 ```
 
-
-
-
 ####Comparison between test and transfer phase
 
 ```{r}
 comptt<-t.test(ripmon_separate$correct[ripmon_separate$phase=="test"], ripmon_separate$correct[ripmon_separate$phase=="transfer"], paired = TRUE, alternative = "two.sided")
 comptt
 ```
+
+Getting the data for the first trial of Transfer
+
+```{r}
+ripmon_1st_trial <- ripmon1 %>%
+  filter(phase=="transfer" & sessionno=="1", trialno=="1") %>%
+  group_by(id, age, sex, trialtype, order) %>% 
+  summarize(correct)
+```
+
+Trial 1 success in Transfer
+
+```{r}
+firsttrial <- glm(correct~age+sex+trialtype,data=ripmon_1st_trial,family=binomial(link = "logit"))
+summary(firsttrial)
+```
+
+Is the performance above chance in first trial of Transfer?
+ 
+```{r}
+firsttrial_trans<-t.test(ripmon_1st_trial$correct, mu=0.5, alternative = "two.sided")
+firsttrial_trans
+```
+
+How about the first 8 trials of Test phase
+
+```{r}
+ripmon_complete<-read.csv("ripped_monkey_complete.csv", header=T)
+ripmon_test8 <- ripmon_complete %>%
+  filter(sessiontype=="test" & sessionno=="1") %>%
+  group_by(id, sex, sessiontype, trialtype, trialno, phase) %>% 
+  summarize(correct)
+```
+
+Performance against chance in the first 8 trials of the test phase
+
+```{r}
+ttest8<-t.test(ripmon_test8$correct, mu=0.5, alternative = "two.sided")
+ttest8
+```
+They are at chance level in the first 8 trials of Test (for comparison purposes with children). 
 
