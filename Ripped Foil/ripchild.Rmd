@@ -9,7 +9,7 @@ output: word_document
 #This sets general options for the code chunks in the R Markdown file. The echo, warning, and message = FALSE hide the code chunks, warning messages, and other messages, where the ‘include=true’ will make all figures appear in the text. You can set some of these variables to TRUE, and hit Knit to see what they change. 
 ```
 
-```{r}
+```{r, include=FALSE}
 #PREPARE
 R.Version()#for referencing, shows you which R version you are using
 rm(list=ls())#removes any other items in your workspace
@@ -37,28 +37,27 @@ library("ggpubr")
 library(dplyr)
 
 ```
+##Exploring the data
 
-####The structure of the data is shown below with all the variable names and levels of measurement.
+The structure of the data is shown below with all the variable names and levels of measurement.
 
 ```{r echo=FALSE}
 ripchild$age <- as.factor(ripchild$age)# makes continuous variables categorical
 ripchild$id<-as.factor(ripchild$id)
 ripchild$sex<-as.factor(ripchild$sex)
-
 str(ripchild)
-
 ```
 
-####We decided to use age as a continuous variable (age in months) in our main analyses rather than categorical to have more power.The distribution of age:
+We decided to use age as a continuous variable (age in months) in our main analyses rather than categorical to have more power.The distribution of age:
 
 ```{r pressure, echo=FALSE}
 hist(ripchild$agemonths, xlab="Age in months (36-72)", ylab="Frequency")
 
 ```
 
-####I aggregated the trial-by-trial data to create one score per child for Test and Transfer phases so I can check whether they are normally distributed or not.
+Next I aggregated the trial-by-trial data to create one score per child for Test and Transfer phases as well as an overall score so I can check whether they are normally distributed or not.
 
-```{r echo=FALSE}
+```{r warning=FALSE}
 ripchild_individual <- ripchild %>%
   group_by(id, age, agemonths) %>% 
   summarize(correct = mean(correct))%>%
@@ -78,17 +77,17 @@ ripchild_transfer <- ripchild %>%
 
 ```
 
-##Histograms for Test and Transfer
+##Histograms for Test and Transfer Phases and an overall score (ripchild_individual)
 
-```{r}
+```{r echo=FALSE}
 hist(ripchild_test$correct, xlab="Mean score in Test", xlim=c(0,1))
 hist(ripchild_transfer$correct, xlab="Mean score in Transfer", xlim=c(0,1))
 hist(ripchild_individual$correct, xlab="Overall score (Test and Transfer)", xlim=c(0,1))
 ```
 
-##The normality tests
+##The tests of normality for Test and Transfer phases as well as for the overall score
 
-```{r}
+```{r echo=FALSE}
 shapiro.test(ripchild_individual$correct)
 
 shapiro.test(ripchild_test$correct)
@@ -96,9 +95,9 @@ shapiro.test(ripchild_test$correct)
 shapiro.test(ripchild_transfer$correct)
 ```
 
-####The Shapiro-Wilk normality tests confirm that the data are not normally distributed for Test and Transfer phases (neither for an overall score).
+The Shapiro-Wilk normality tests confirm that the data are not normally distributed for Test and Transfer phases (neither for an overall score).
 
-####Below is the how children in different ages perform in test and transfer.
+##Below is the how children in different ages perform in test and transfer.
 ```{r echo=FALSE}
 testBYage<-ggplot(ripchild_test, aes(agemonths, correct))
 s1<-testBYage + geom_point(aes(), position="jitter") + labs(x= "Age in months", y= "Mean Performance in Test")+ 
@@ -112,13 +111,15 @@ s2<-transferBYage + geom_point(aes(), position="jitter") + labs(x= "Age in month
 
 grid.arrange(s1, s2, nrow = 1, heights=unit(100, "mm"))
 ```
+The regression line (with a 95% CI) for the Transfer phase is steeper than the Test phase. Younger children seem to be doing worse in Transfer than in Test.
 
-####The regression line (with a 95% CI) for the Transfer phase is steeper than the Test phase. Younger children seem to be doing worse in Transfer than in Test.
+##Preparation of the data for running the GLMM
 
+*Z-transformations for 'trial no' and 'age in months'
+*Coding dummy variables for trialtype, sex and phase (order3)
+*Centering the random slope components for these variables.
 
-####Next is the pre-processing of data: z-transformations for 'trial no' and 'age in months', coding dummy variables for trialtype, sex and phase (order3), and finally centering the random slope components for these variables.
-
-```{r echo=FALSE}
+```{r include=FALSE}
 #Preprocessing of data, Z-transforming trial no and age
 
 ripchild$z.trialno<-as.vector(scale(ripchild$trialno))
@@ -129,7 +130,7 @@ summary(ripchild)
 
 ```
 
-```{r}
+```{r include=FALSE}
 #Coding dummy variables before centering the slopes
 ripchild$trialtype.sticker<-as.numeric(ripchild$trialtype==levels(ripchild$trialtype)[2])
 ripchild$sex.m<-as.numeric(ripchild$sex==levels(ripchild$sex)[2])
@@ -172,7 +173,7 @@ full<-glmer(correct ~ trialtype*order3+z.trialno+z.age*order3+sex+(1|id)+(0+z.tr
 
 ```
 
-####The full model does not include box type (the location of the blue/pink box) as a random effect anymore due to convergence issues.
+The full model does not include box type (the location of the blue/pink box) as a random effect anymore due to convergence issues. But there is a singular fit warning here as you can see.
 
 ##Model assumptions
 
@@ -184,7 +185,7 @@ ranef.diagn.plot(full)
 
 ####Model stability
 
-```{r include=FALSE}
+```{r echo=FALSE}
 #summary reveals min and max of the estimates obtained after casewise deletion of levels of random effects together with the original estimates.
 m.stab=glmm.model.stab(model.res=full, contr=contr)
 m.stab.plot(m.stab$summary[,-1])
@@ -206,31 +207,33 @@ round(vif(coll),3)
 #overdispersion test
 overdisp.test(full)
 ```
+None of these seem to show a problem- although not sure how to interpret stability.
 
 ##Null model
 
 ```{r echo=TRUE}
 null<-glmer(correct~ 1+(1|id)+(0+z.trialno+order3.transfer.c+trialtype.sticker.c|id),data=ripchild, family=binomial, control=contr)
-
 ```
 
 ##Full and Null comparison
-```{r echo=TRUE}
+```{r echo=FALSE}
 round(anova(null, full, test="Chisq"),3)
 ```
+
+The full model is significantly different than the null model.
 
 ##Model output
 
 ####Coefficients
 
-```{r}
+```{r echo=FALSE}
 round(summary(full)$coefficients, 3)
 
 ```
 
 ####Individual predictor: Likelihood tests
 
-```{r}
+```{r echo=FALSE}
 xdrop1=drop1(full, test="Chisq",control=contr)
 round(xdrop1,3)
 ```
@@ -246,29 +249,28 @@ round(model1CI$ci.estimates, 3)
 ```
 
 
-####The interactions terms are not significant (although there is a trend for scores to vary by age) so I will remove them from the model.
+**The interactions terms are not significant (although there is a trend for scores to vary by age) so I will remove them from the model.**
 
 ##Reduced model without the interactions
 ##Full model 2
 
 ```{r echo=TRUE}
 full2=glmer(correct ~ trialtype+order3+z.trialno+z.age+sex+(1|id)+(0+z.trialno+order3.transfer.c+trialtype.sticker.c|id),data=ripchild, family=binomial, control=contr)
-summary(full2)
 ```
 
 ##Null model
 
 ```{r echo=TRUE}
-null<-glmer(correct~ 1+(1|id)+(0+z.trialno+order3.transfer.c+trialtype.sticker.c|id),data=ripchild, family=binomial, control=contr)
-
+null2<-glmer(correct~ 1+(1|id)+(0+z.trialno+order3.transfer.c+trialtype.sticker.c|id),data=ripchild, family=binomial, control=contr)
 ```
 
 ####Full 2 and null comparision
 
-```{r}
-round(anova(null, full2, test="Chisq"),3)
-
+```{r echo=FALSE}
+round(anova(null2, full2, test="Chisq"),3)
 ```
+
+Full model is significantly different than the null model.
 
 ##Model output
   
@@ -286,7 +288,7 @@ xdrop1=drop1(full2, test="Chisq",control=contr)
 round(xdrop1,3)
 ```
 
-####Age emerges as a significant predictor of scores.
+**Age emerges as a significant predictor of scores.**
 
 ```{r include=FALSE}
 # this is for me to check the variance added by random effects, number of observations and subjects etc.
@@ -312,16 +314,18 @@ r.squaredGLMM(object=full2)
 
 #as I’m not very passionate about effect sizes, I don’t go into detail here. the (marginal and conditional) effect sizes in the row headed delta are the ones according to a recent paper (Nakagawa et al., 2017) which you should report. Marginal R-squared is the variance explained by the fixed effects. The conditional R-squared is the variance explained by the fixed and random effects (the model)
 ```
+Here we look at the row headed delta. Marginal R-squared is the variance explained by the fixed effects and the conditional R-squared is the variance explained by the fixed and random effects (the model).
 
-####Running a separate model for the CI calculation. Age is entered as age in months (notz transformed).
+##Scatterplot 1 to see the effect of age in the overall score. 
 
-```{r include=TRUE}
+*Running a separate model for the CI calculation.
+
+```{r echo=TRUE}
 #running a new model for CI predictions
 full.CI=glmer(correct ~ z.trialno+order3.transfer.c+trialtype.sticker.c+z.age+sex.m.c+(1+z.trialno+order3.transfer.c+trialtype.sticker.c|id),data=ripchild, family=binomial, control=contr)
-
 ```
 
-####Getting confidence intervals for fitted values
+*Getting confidence intervals for fitted values
 
 ```{r include=FALSE}
 #boot.res=boot.glmm.pred(model.res=full.CI, excl.warnings=T, nboots=1000, resol=68, level=0.95, use="z.age", n.cores="all-1", para=T)#with para=T your computer will get very slow so I recommend using this option particularly when you don't need to work with the PC in parallel (the CI calculation will be a lot faster though)
@@ -361,9 +365,9 @@ scatter
 
 ```
 
-####The plot is not informative as age in z-transformed. I correct this below.
+**The plot is not very informative as age in z-transformed. I correct this below.**
 
-```{r include=FALSE}
+```{r echo=FALSE}
 ripchild_individual <- ripchild %>%
   group_by(id, age, agemonths) %>% 
   summarize(correct = mean(correct))%>%
@@ -371,7 +375,7 @@ ripchild_individual <- ripchild %>%
   group_by(agemonths)%>%
     add_count(correct)
 
-plot.xvals=seq(from=min(ripchild_individual$agemonths), to=max(ripchild_individual$agemonths),length.out=68)
+plot.xvals=seq(from=min(ripchild_individual$agemonths),to=max(ripchild_individual$agemonths),length.out=68)
 
 ##using ggplot but using the values from ripchild_individual instead)
 
@@ -405,7 +409,7 @@ lty=3)
 abline(h = 0.5, col="red", lwd=3, lty=2)
 ```
 
-####Running a new model for calculating CIs for the interaction model so we can plot the performance in test and transfer separately.
+####Running a new model for calculating CIs for the interaction model so we can plot the performance in test and transfer across ages separately.
 
 ```{r include=TRUE}
 full.CI.int<-glmer(correct ~ trialtype.sticker.c+z.age*order3+sex.m.c+z.trialno+(1|id)+(0+z.trialno+order3.transfer.c+trialtype.sticker.c|id),data=ripchild, family=binomial, control=contr)
@@ -422,7 +426,7 @@ full.CI.int<-glmer(correct ~ trialtype.sticker.c+z.age*order3+sex.m.c+z.trialno+
 load("ripped_foil_child_CIs_interaction.RData")
 ```
 
-####The plot for performance in Test and Transfer across age.
+####Performance in Test and Transfer across age.
 
 ```{r echo=FALSE}
 ripchild_separate <- ripchild %>%
@@ -444,7 +448,7 @@ scatter.int
 
 ```
 
-####However, the age is z-transformed so the plot is not very informative. We change z-age to age in months.
+**However, the age is z-transformed so the plot is not very informative. We change z-age to age in months.**
 
 ```{r echo=TRUE}
 #do the same scatter plot for interaction with age not z-tranformed so the graph is more informative.
@@ -469,16 +473,19 @@ scatter.int2<-ggplot(ripchild_separate2, aes(x=plot.int, y=boot.res.int$ci.predi
 
 ####The CIs do not cover the entire range here. How can we fix this?
 
-####Getting the data for the first trial of Transfer
 
-```{r echo=TRUE}
+##First trial performance in Transfer phase
+We expect younger children to make more errors when they switch from test to transfer if they are solving the task using an arbitrary rule.
+*Getting the data for the first trial of Transfer
+
+```{r echo=FALSE}
 ripchild_1st_trial <- ripchild %>%
   filter(order3=="transfer" & trialno=="1") %>%
   group_by(id, age, agemonths, sex, trialtype, z.age, trialtype.sticker.c) %>% 
   summarize(correct)
 ```
 
-####Trial 1 success in Transfer
+####Performance in trial 1 of Transfer phase
 
 ```{r echo=TRUE}
 firsttrial <- glm(correct~agemonths+sex+trialtype,data=ripchild_1st_trial,family=binomial(link = "logit"))
@@ -486,7 +493,8 @@ summary(firsttrial)
 
 ```
 
-####Age is a significant predictor of first trial performance of Transfer.
+**Age emerges as a significant predictor of first trial performance of Transfer.**
+We can plot this as:
 
 ```{r echo=FALSE}
 #how about ggplot
@@ -494,7 +502,7 @@ ggplot(ripchild_1st_trial, aes(x=agemonths, y=correct)) + geom_point() +
   stat_smooth(method="glm", fullrange = TRUE, lty=2, size=0.5, colour="Black", alpha=0.2,  method.args=list(family="binomial"))+ylab("First trial performance of Transfer Phase")+xlab("Age in months")+xlim(36,72)+theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 ```
 
-####Here is the plot for the first trial performance in Transfer.
+**Younger children tend to make more errors than older children**
 
 
 

@@ -1,7 +1,7 @@
 ---
 title: "Ripped Foil - Monkeys"
 author: "Zeynep Civelek"
-date: "June 25, 2020"
+date: "June 30, 2020"
 output: word_document
 ---
 ```{r setup, include=FALSE}
@@ -10,14 +10,14 @@ knitr::opts_chunk$set(echo=FALSE, warning=FALSE, message=FALSE, include=TRUE)
 #This sets general options for the code chunks in the R Markdown file. The echo, warning, and message = FALSE hide the code chunks, warning messages, and other messages, where the ‘include=true’ will make all figures appear in the text. You can set some of these variables to TRUE, and hit Knit to see what they change. 
 ```
 
-```{r}
+```{r, include=FALSE}
 #PREPARE
 R.Version()#for referencing, shows you which R version you are using
 rm(list=ls())#removes any other items in your workspace
 ls()#check whether workspace is empty
 ```
 
-```{r}
+```{r, include=FALSE}
 #Directory is set, data is added and all the libraries necessary for running the analyses are loaded.
 
 ripmon1<-read.csv("ripped_monkey_test16.csv", header=T)
@@ -38,10 +38,11 @@ library("ggpubr")
 library(dplyr)
 
 ```
+##Exploring data 
 
 The structure of the data is shown below with all the variable names and levels of measurement.
 
-```{r}
+```{r, echo=FALSE}
 ripmon1$id<-as.factor(ripmon1$id)
 ripmon1$sex<-as.factor(ripmon1$sex)
 ripmon1$phase2<-as.factor(ripmon1$phase2)
@@ -50,9 +51,57 @@ str(ripmon1)
 
 ```
 
-I aggregated the trial-by-trial data to create one score per monkey for Test and Transfer phases so I can check whether they are normally distributed or not.
+Exploring the warm-up 1 (locating the reward when there is no foil covering the cups) and warm-up 2 phases (locating the reward when the cups are covered with foil).
+```{r, echo=FALSE}
+ripmon_complete<-read.csv("ripped_monkey_complete.csv", header=T)
+ripmon_warm1 <- ripmon_complete %>%
+  filter(sessiontype=="warmup") %>%
+  group_by(id, sex, age, sessionno, trialno) %>% 
+  summarize(correct)
 
-```{r}
+ripmon_warm2 <- ripmon_complete %>%
+  filter(sessiontype=="foil") %>%
+  group_by(id, sex, age, sessionno, trialno) %>% 
+  summarize(correct)
+
+range(ripmon_warm1$sessionno)
+range(ripmon_warm2$sessionno)
+```
+**In warm-up 1, monkeys got up to 18 sessions to reach criterion and in warm-up 2, up to 6 sessions (or they'd receive up to 10 sessions). The minimum number of sessions to reach criterion was 2 (14/16 correct)**
+
+##Histograms for Warm-up 1 and Warm-up 2 Phases
+```{r, echo=FALSE}
+agg_warm1 <- aggregate(ripmon_warm1$correct, by = list(id = ripmon_warm1$id), function(x) c(mean = mean(x), sd = sd(x), n = length(x)))
+agg_warm1 <- do.call(data.frame, agg_warm1)
+agg_warm1$se <- agg_warm1$x.sd / sqrt(agg_warm1$x.n)
+
+colnames(agg_warm1) <- c("id", "mean", "sd", "n", "se")
+
+agg_warm1$names <- c(paste(agg_warm1$id, "id"))
+
+limits <- aes(ymax = agg_warm1$mean + agg_warm1$se,
+              ymin = agg_warm1$mean - agg_warm1$se)
+
+hist(agg_warm1$mean, xlab="Mean score in Warm-up 1", xlim=c(0,1))
+
+agg_warm2 <- aggregate(ripmon_warm2$correct, by = list(id = ripmon_warm2$id), function(x) c(mean = mean(x), sd = sd(x), n = length(x)))
+agg_warm2 <- do.call(data.frame, agg_warm2)
+agg_warm2$se <- agg_warm2$x.sd / sqrt(agg_warm2$x.n)
+
+colnames(agg_warm2) <- c("id", "mean", "sd", "n", "se")
+
+agg_warm2$names <- c(paste(agg_warm2$id, "id"))
+
+limits <- aes(ymax = agg_warm2$mean + agg_warm2$se,
+              ymin = agg_warm2$mean - agg_warm2$se)
+
+hist(agg_warm2$mean, xlab="Mean score in Warm-up 2", xlim=c(0,1))
+
+```
+
+I then aggregated the trial-by-trial data to create one score per monkey for Test and Transfer phases so I can check whether or not they are normally distributed.
+
+```{r, echo=FALSE}
 ripmon_individual <- ripmon1 %>%
   filter(!is.na(correct)) %>%
   group_by(id) %>% 
@@ -73,7 +122,6 @@ ripmon_transfer <- ripmon1 %>%
   summarize(correct = mean(correct))%>%
   add_count(correct)
 
-
 ripmon_separate <- ripmon1 %>%
    filter(!is.na(correct)) %>%
   group_by(id, phase,age) %>% 
@@ -82,15 +130,16 @@ ripmon_separate <- ripmon1 %>%
 
 ```
 
-Histograms for Test and Transfer
+##Histograms for Test and Transfer Phases and the overall score
 
 ```{r}
 hist(ripmon_test$correct, xlab="Mean score in Test", xlim=c(0,1))
 hist(ripmon_transfer$correct, xlab="Mean score in Transfer", xlim=c(0,1))
 hist(ripmon_individual$correct, xlab="Overall score (Test and Transfer)", xlim=c(0,1))
 ```
+##The tests of normality for Test and Transfer phases as well as for the overall score
 
-```{r}
+```{r, echo=FALSE}
 
 shapiro.test(ripmon_individual$correct)
 
@@ -100,17 +149,21 @@ shapiro.test(ripmon_transfer$correct)
 ```
 The Shapiro-Wilk normality tests show that the data are normally distributed for Test and Transfer phases (as well as the overall scores per individual).
 
-Below is how performance looks in the last 16 trials of Test and Transfer
-```{r}
+##Below is how performance looks in the last 16 trials of Test and Transfer
+```{r, echo=FALSE}
 boxplot1 <- ggplot(ripmon_separate, aes(x=phase, y=correct)) + 
     geom_dotplot(binaxis='y', stackdir='center', dotsize=0.5) + ylim(0,1)
 boxplot1 + stat_summary(fun.data="mean_sdl", fun.args = list(mult=1), geom="crossbar", width=0.5) + stat_summary(fun.y=mean, geom="point", color="red")+theme_bw() + stat_summary(fun.data=mean_sdl, fun.args = list(mult=1), 
                  geom="pointrange", color="red")+ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+geom_hline(yintercept=0.50, color='red', linetype="dashed")+xlab("Phase") + ylab("Mean number of correct responses in 16 trials")
 ```
 
-Next we preprocess the data; scaling age and trial number, coding categorical variables as dummy variables and centering the slopes.
+##Preparation of the data for running the GLMM
 
-```{r}
+* Scaling age and trial number
+* Coding categorical variables as dummy variables 
+* Centering the slopes.
+
+```{r, echo=FALSE}
 #We scale variables so that the differences in the range of the variables do not influence the parameter estimations.
 ripmon1$z.trialno<-as.vector(scale(ripmon1$trialno))
 ripmon1$z.age=as.vector(scale(ripmon1$age))
@@ -127,16 +180,15 @@ ripmon1$trialtype.food.c<-ripmon1$trialtype.food-mean(ripmon1$trialtype.food)
 ripmon1$phase.transfer.c=ripmon1$phase.transfer-mean(ripmon1$phase.transfer)
 ripmon1$sex.m.c<-ripmon1$sex.m -mean(ripmon1$sex.m)
 
-summary(ripmon1)
 ```
 
-```{r}
+```{r, echo=FALSE}
 source("./Roger_functions/diagnostic_fcns.r")
 source("./Roger_functions/glmm_stability.r")
 source("./Roger_functions/boot_glmm.r")
 ```
 
-```{r}
+```{r, include=FALSE}
 
 # Guide on how to decide on the model...
 
@@ -149,24 +201,26 @@ xx.fe.re$summary
 ydata=xx.fe.re$data
 ```
 
-Full model (removed box location from random effects)
+##Full model 
 
-```{r}
+```{r, echo=TRUE}
 contr<-glmerControl(optimizer="bobyqa", optCtrl=list(maxfun=10000000))
 full=glmer(correct ~ trialtype*phase+z.trialno+z.age+sex+(1+z.trialno+phase.transfer.c+trialtype.food.c|id),data=ripmon1, family=binomial, control=contr)
 ```
 
-Model assumptions
+The full model does not include box type (the location of the blue/pink box) as a random effect anymore due to convergence issues. 
 
-Distribution of random effects
-```{r}
+##Model assumptions
+
+####Distribution of random effects
+```{r, echo=FALSE}
 #An assumption of GLMMs is that the BLUPs are normally distributed. We use the following function to evaluate this. BLUPs are Best Linear Unbiased Predictors: the estimated grouping factor's level specific deviation from the common intercept or slope.
 ranef.diagn.plot(full)
 ```
 
-Model stability
+####Model stability
 
-```{r}
+```{r, echo=FALSE}
 #summary reveals min and max of the estimates obtained after casewise deletion of levels of random effects together with the original estimates.
 m.stab=glmm.model.stab(model.res=full, contr=contr)
 m.stab.plot(m.stab$summary[,-1])
@@ -174,127 +228,129 @@ m.stab$summary
 m.stab$detailed$warnings
 ```
 
-Multicollinearity
+####Multicollinearity
 
-```{r}
+```{r, echo=FALSE}
 coll=lm(correct ~ trialtype*phase+z.trialno+z.age+sex, data=ripmon1)
 round(vif(coll),3)
 #no vif issues
 ```
 
-Overdispersion
+####Overdispersion
 
-```{r}
+```{r, echo=FALSE}
 #overdispersion test
 overdisp.test(full)
 ```
 
-Null model
+##Null model
 
-```{r}
+```{r, echo=TRUE}
 null=glmer(correct~(1+z.trialno+phase.transfer.c+trialtype.food.c|id),data=ripmon1, family=binomial, control=contr)
 ```
 
 Question: I do have (1|id) as another random effect in the child model. Do I not need to include it here?
 
-Full and Null comparison
-```{r}
+##Full and Null comparison
+```{r, echo=FALSE}
 round(anova(null, full, test="Chisq"),3)
 ```
 
-Model output
+##Model output
 
-Coefficients
+####Coefficients
 
-```{r}
+```{r, echo=FALSE}
 round(summary(full)$coefficients, 3)
 ```
 
-Individual predictor: Likelihood tests
+####Individual predictor: Likelihood tests
 
-```{r}
+```{r, echo=FALSE}
 xdrop1=drop1(full, test="Chisq",control=contr)
 round(xdrop1,3)
 ```
 
-Confidence intervals for the full model with the interaction
+####Confidence intervals for the full model with the interaction
 
-```{r}
+```{r, echo=FALSE}
 # ripmon_model1=boot.glmm.pred(model.res=full, excl.warnings=T, nboots=1000, para=T)
-# round(ripmon_model1$ci.estimates, 3)
 # save.image("ripmon_model1_CIs.RData")
 load("ripmon_model1_CIs.RData")
+round(ripmon_model1$ci.estimates, 3)
+
 ```
 
-The interaction term is not significant so I will remove it from the model.
+**The interaction term is not significant so I will remove it from the model.**
 
-Reduced model without the interaction
-Full model 2
+##Reduced model without the interaction
+##Full model 2
 
-```{r}
+```{r, echo=TRUE}
 full2=glmer(correct ~ trialtype+phase+z.trialno+z.age+sex+(1+z.trialno+phase.transfer.c+trialtype.food.c|id),data=ripmon1, family=binomial, control=contr)
 summary(full2)
 ```
 
 I get the following warning: convergence code: 0, boundary (singular) fit: see ?isSingular.
 
-The results show that there is a significant effect of sex and trial type.
+**The model summary show that there is a significant effect of sex and trial type.**
 
-Null model
+##Null model 2
 
-```{r}
-null<-glmer(correct~ (1+z.trialno+phase.transfer.c+trialtype.food.c|id),data=ripmon1, family=binomial, control=contr)
+```{r, echo=TRUE}
+null2<-glmer(correct~ (1+z.trialno+phase.transfer.c+trialtype.food.c|id),data=ripmon1, family=binomial, control=contr)
 ```
 
-Full 2 and null comparision
+##Full and null model (2) comparion
 
-```{r}
+```{r, echo=FALSE}
 round(anova(null, full2, test="Chisq"),3)
 ```
 
-####Model output
-  +Coefficients
+##Model output
 
-```{r echo=FALSE}
+####Coefficients
+
+```{r, echo=FALSE}
 round(summary(full2)$coefficients, 3)
 
 ```
 
-  + Individual predictors : Likelihod ratio tests
-  
+####Individual predictors : Likelihood ratio tests
   
 ```{r echo=FALSE}
 xdrop1=drop1(full2, test="Chisq",control=contr)
 round(xdrop1,3)
 ```
 
-```{r}
+```{r, include=FALSE}
 # this is for me to check the variance added by random effects, number of observations and subjects etc.
 print(summary(full2), corr=FALSE)
 ```
 
-Confidence intervals for the reduced model without the interaction
+####Confidence intervals for the reduced model without the interaction
 
-```{r}
+```{r, echo=FALSE}
 # ripmon_model2=boot.glmm.pred(model.res=full2, excl.warnings=T, nboots=1000, para=T)
-# round(ripmon_model2$ci.estimates, 3)
 # save.image("ripmon_model2_CIs.RData")
 load("ripmon_model2_CIs.RData")
+round(ripmon_model2$ci.estimates, 3)
 ```
 
-Calculating effect sizes for the final model
+####Calculating effect sizes for the final model
 
-```{r}
+```{r, echo=FALSE}
 #install.packages("MuMIn")
 library("MuMIn")
 r.squaredGLMM(object=full2)
 
 #the (marginal and conditional) effect sizes in the row headed delta are the ones according to a recent paper (Nakagawa et al., 2017) which you should report. Marginal R-squared is the variance explained by the fixed effects. The conditional R-squared is the variance explained by the fixed and random effects (the model)
 ```
+Here we look at the row headed delta. Marginal R-squared is the variance explained by the fixed effects and the conditional R-squared is the variance explained by the fixed and random effects (the model).
 
-Looking at the graph before running the analyses on the effect of sex and trial type
 
-```{r}
+##Plotting the findings
+```{r, echo=FALSE}
 ripmon_individual2<-ripmon1 %>% 
   group_by(phase, id) %>% 
   summarize(foil.correct = mean(correct)) %>% 
@@ -319,9 +375,8 @@ p3 <- ggplot(data=ripmon_individual4, aes(x=sex, y=foil.correct, group=sex)) + g
 grid.arrange(p1, p2, p3, nrow = 1, heights=unit(100, "mm"))
 ```
 
-Performance in test and transfer with a bar graph.
 
-```{r}
+```{r, include=FALSE}
 #Doing a bar graph
 
 ripaggregate <- aggregate(ripmon1$correct, by = list(order = ripmon1$order, phase = ripmon1$phase), function(x) c(mean = mean(x), sd = sd(x), n = length(x)))
@@ -348,13 +403,15 @@ ttest
 ttransfer<-t.test(ripmon_separate$correct[ripmon_separate$phase=="transfer"] , mu=0.5, alternative = "two.sided")
 ttransfer
 ```
+**Performance is above chance in both Test (last 16 trials) and Transfer phases.**
 
 ####Comparison between test and transfer phase
 
-```{r}
+```{r, echo=FALSE}
 comptt<-t.test(ripmon_separate$correct[ripmon_separate$phase=="test"], ripmon_separate$correct[ripmon_separate$phase=="transfer"], paired = TRUE, alternative = "two.sided")
 comptt
 ```
+**There is no significant difference between the monkeys' performances in Test and Transfer phases.**
 
 ####Trial type
 
@@ -371,10 +428,11 @@ ttypestick
 ttype<-t.test(ripmon_individual3$foil.correct[ripmon_individual3$trialtype=="food"], ripmon_individual3$foil.correct[ripmon_individual3$trialtype=="stick"], paired = TRUE, alternative = "two.sided")
 ttype
 ```
+**There is a significant difference between performances in different trial types: Monkeys performed better in food-stick trials than in stick-food trials.**
 
 ####Sex
 
-```{r}
+```{r, echo=FALSE}
 ttmale<-t.test(ripmon_individual4$foil.correct[ripmon_individual4$sex=="m"] , mu=0.5, alternative = "two.sided")
 ttmale
 ttfemale<-t.test(ripmon_individual4$foil.correct[ripmon_individual4$sex=="f"] , mu=0.5, alternative = "two.sided")
@@ -382,56 +440,60 @@ ttfemale
 ```
 ####Comparison between males and females
 
-```{r}
+```{r, echo=FALSE}
 tsex<-t.test(ripmon_individual4$foil.correct[ripmon_individual4$sex=="m"], ripmon_individual4$foil.correct[ripmon_individual4$sex=="f"], paired = FALSE, alternative = "two.sided")
 tsex
 ```
+**Males performed significantly better than females.**
 
 ####Comparison between test and transfer phase
 
-```{r}
+```{r, echo=FALSE}
 comptt<-t.test(ripmon_separate$correct[ripmon_separate$phase=="test"], ripmon_separate$correct[ripmon_separate$phase=="transfer"], paired = TRUE, alternative = "two.sided")
 comptt
 ```
 
-Getting the data for the first trial of Transfer
 
-```{r}
+##First trial performance in Transfer phase
+
+```{r, include=FALSE}
 ripmon_1st_trial <- ripmon1 %>%
   filter(phase=="transfer" & sessionno=="1", trialno=="1") %>%
   group_by(id, age, sex, trialtype, order) %>% 
   summarize(correct)
 ```
 
-Trial 1 success in Transfer
-
-```{r}
+####Performance in Trial 1 of Transfer
+```{r, echo=TRUE}
 firsttrial <- glm(correct~age+sex+trialtype,data=ripmon_1st_trial,family=binomial(link = "logit"))
 summary(firsttrial)
 ```
 
-Is the performance above chance in first trial of Transfer?
+####Is the performance above chance in first trial of Transfer?
  
-```{r}
+```{r,echo=FALSE}
 firsttrial_trans<-t.test(ripmon_1st_trial$correct, mu=0.5, alternative = "two.sided")
 firsttrial_trans
 ```
+**No, performance in the first trial of transfer does not differ from chance level.
 
-How about the first 8 trials of Test phase
 
-```{r}
-ripmon_complete<-read.csv("ripped_monkey_complete.csv", header=T)
+##How about the first 8 trials of Test phase (to be able to compare to children)?
+
+```{r, echo=FALSE}
 ripmon_test8 <- ripmon_complete %>%
   filter(sessiontype=="test" & sessionno=="1") %>%
   group_by(id, sex, sessiontype, trialtype, trialno, phase) %>% 
   summarize(correct)
 ```
 
-Performance against chance in the first 8 trials of the test phase
+##Performance against chance in the first 8 trials of the test phase:
 
-```{r}
+```{r, echo=FALSE}
 ttest8<-t.test(ripmon_test8$correct, mu=0.5, alternative = "two.sided")
 ttest8
 ```
-They are at chance level in the first 8 trials of Test (for comparison purposes with children). 
+**They are at chance level in the first 8 trials of Test (for comparison purposes with children).**
+
+
 
