@@ -262,8 +262,8 @@ round(xdrop1,3)
 ####Confidence intervals for the full model with the interaction
 
 ```{r, echo=FALSE}
-conmon_model1=boot.glmm.pred(model.res=full, excl.warnings=T, nboots=1000, para=T)
-save.image("conmon_model1_CIs.RData")
+# conmon_model1=boot.glmm.pred(model.res=full, excl.warnings=T, nboots=1000, para=T)
+# save.image("conmon_model1_CIs.RData")
 load("conmon_model1_CIs.RData")
 round(conmon_model1$ci.estimates, 3)
 
@@ -321,8 +321,8 @@ print(summary(full2), corr=FALSE)
 ####Confidence intervals for the reduced model without the interaction
 
 ```{r, echo=FALSE}
-conmon_model2=boot.glmm.pred(model.res=full2, excl.warnings=T, nboots=1000, para=T)
-save.image("conmon_model2_CIs.RData")
+# conmon_model2=boot.glmm.pred(model.res=full2, excl.warnings=T, nboots=1000, para=T)
+# save.image("conmon_model2_CIs.RData")
 load("conmon_model2_CIs.RData")
 round(conmon_model2$ci.estimates, 3)
 ```
