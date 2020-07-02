@@ -52,6 +52,7 @@ str(conmon1)
 ```
 
 Exploring the warm-up 1 (the cups are initially empty/not covered and after the hiding event the baited cup is covered with patterned paper and the empty cup is covered with white paper) and warm-up 2 phases (the cups are initially covered with white paper and after the hiding event, the baited cup is covered with patterned paper).
+
 ```{r, echo=FALSE}
 conmon_complete<-read.csv("control_monkey_complete.csv", header=T)
 conmon_warm1 <- conmon_complete %>%
@@ -67,7 +68,8 @@ conmon_warm2 <- conmon_complete %>%
 range(conmon_warm1$sessionno)
 range(conmon_warm2$sessionno)
 ```
-**In warm-up 1, monkeys got up to 11 sessions to reach criterion and in warm-up 2, up to 2 sessions (or they'd receive up to 10 sessions). The minimum number of sessions to reach criterion was 2 (14/16 correct)**
+
+**In warm-up 1, monkeys received up to 11 sessions to reach criterion and in warm-up 2, up to 2 sessions (or they'd receive up to 10 sessions). The minimum number of sessions to reach criterion was 2 (14/16 correct)**
 
 ##Histograms for Warm-up 1 and Warm-up 2 Phases
 ```{r, echo=FALSE}
@@ -161,7 +163,7 @@ boxplot1 + stat_summary(fun.data="mean_sdl", fun.args = list(mult=1), geom="cros
 ##Preparation of the data for running the GLMM
 
 * Scaling age and trial number
-* Coding categorical variables as dummy variables 
+* Coding categorical variables (trial type, sex, phase) as dummy variables 
 * Centering the slopes.
 
 ```{r, echo=FALSE}
@@ -196,7 +198,7 @@ contr<-glmerControl(optimizer="bobyqa", optCtrl=list(maxfun=10000000))
 full=glmer(correct ~ trialtype*phase+z.trialno+z.age+sex+(1+z.trialno+phase.transfer.c+trialtype.food.c|id),data=conmon1, family=binomial, control=contr)
 ```
 
-The full model does not include box type (the location of the blue/pink box) as a random effect anymore due to convergence issues. 
+The full model does not include box type (the location of the blue/pink box) as a random effect anymore due to convergence issues. There is the singular fit warning here and throughout though.
 
 ##Model assumptions
 
@@ -237,7 +239,7 @@ overdisp.test(full)
 null=glmer(correct~(1+z.trialno+phase.transfer.c+trialtype.food.c|id),data=conmon1, family=binomial, control=contr)
 ```
 
-Question: I do have (1|id) as another random effect in the child model. Do I not need to include it here?
+**Question: I do have (1|id) as another random effect in the child model. Do I not need to include it here?**
 
 ##Full and Null comparison
 ```{r, echo=FALSE}
@@ -269,7 +271,7 @@ round(conmon_model1$ci.estimates, 3)
 
 ```
 
-**The null and full models are not significantly different from each other. But the interaction model is not significant. I will remove this next to see if it improves the model.**
+**The null and full models are not significantly different from each other. But the interaction term is not significant. I will remove this next to see if it improves the model.**
 
 ##Reduced model without the interaction
 ##Full model 2
@@ -281,7 +283,7 @@ summary(full2)
 
 I get the following warning: convergence code: 0, boundary (singular) fit: see ?isSingular.
 
-**The model summary show that there is a significant effect of sex and trial type.**
+**The model shows a significant effect of trial type**
 
 ##Null model 2
 
@@ -310,8 +312,8 @@ round(summary(full2)$coefficients, 3)
 xdrop1=drop1(full2, test="Chisq",control=contr)
 round(xdrop1,3)
 ```
-**The model without the interaction is not significantly different from the null hypothesis either.**
-
+**The model without the interaction is not significantly different from the null model either.**
+**Question: Since the model is not a good fit to the data, I cannot talk about the significant effect of trial type here, is this correct?**
 
 ```{r, include=FALSE}
 # this is for me to check the variance added by random effects, number of observations and subjects etc.
@@ -329,33 +331,79 @@ round(conmon_model2$ci.estimates, 3)
 
 ##Tests against chance
 ####Test and transfer phases
+```{r}
+# install.packages("exactRankTests")
+library(exactRankTests)
+
+better.wilcox=function(var1){
+  test.data=data.frame(var1)
+  test.data=subset( test.data, var1 !=0.5)
+  N=nrow(test.data)
+  w.res=wilcox.exact (test.data$var1, paired=F, exact=T, mu=0.5, alternative = c("two.sided"))
+  wT=w.res$statistic
+  wT=max(c(wT, N*(N+1)/2- wT))
+  return(data.frame(T.plus=wT, N=N, P=w.res$p.value) )}
+
+better.wilcox2=function(var1, var2){
+  test.data=data.frame(var1, var2)
+  test.data=subset( test.data, var1 != var2)
+  N=nrow(test.data)
+  w.res=wilcox.exact (test.data$var1, test.data$var2, paired=T, exact=T, alternative = c("two.sided"))
+  wT=w.res$statistic
+  wT=max(c(wT, N*(N+1)/2- wT))
+  return(data.frame(T.plus=wT, N=N, P=w.res$p.value) )}
+
+#Test phase
+wt1<-better.wilcox(conmon_test$correct) 
+wt1
+median = round(median(conmon_test$correct), 2)
+median 
+
+wt2<-better.wilcox(conmon_transfer$correct) 
+wt2
+median2 = round(median(conmon_transfer$correct), 2)
+median2 
+```
+**Neither test nor transfer performances are different from chance. Any idea why I get wrong sample sizes here?**
+
+##Mann-Whitney U-Test  
+
 ```{r, echo=FALSE}
+mt<-wilcox.exact(conmon_separate$correct~conmon_separate$phase,exact=T)
+mt
+#The test statistic is 'U', despite labelled 'W'but it is not always the smaller of the two U-values to get the smaller (its a convention to indicate this) use:
+u_mt<-min(c(mt$statistic, prod(table(conmon_separate$phase))-mt$statistic))
+u_mt
+#to get the sample sizes use:
+n1_mt<-table(conmon_separate$phase)[1]
+n2_mt<-table(conmon_separate$phase)[2]
+n1_mt
+n2_mt
+```
+**There is no signficiant difference between  the test and transfer performances either.**
+
+
+```{r, include=FALSE}
+#this is for normally distributed samples. Mine is not but I'll keep it for future.
 ttest<-t.test(conmon_separate$correct[conmon_separate$phase=="pattern-test"] , mu=0.5, alternative = "two.sided")
 ttest
 ttransfer<-t.test(conmon_separate$correct[conmon_separate$phase=="pattern-transfer"] , mu=0.5, alternative = "two.sided")
 ttransfer
 ```
 
-**Performance is at chance in both Test (last 16 trials) and Transfer phases.**
-
-####Comparison between test and transfer phases
-
-```{r, echo=FALSE}
+```{r, include=FALSE}
+#this is for normally distributed samples. Mine is not but I'll keep it for future.
 comptt<-t.test(conmon_separate$correct[conmon_separate$phase=="pattern-test"], conmon_separate$correct[conmon_separate$phase=="pattern-transfer"], paired = TRUE, alternative = "two.sided")
 comptt
 ```
-**There is no significant difference between the monkeys' performances in Test and Transfer phases.**
 
-####Trial type
-```{r}
+```{r, include=FALSE}
+#It doesn't make sense to explore trial type because the model was not significant. and even if I did, I should use wilcoxon test as the sample is not normally distributed. But keeping this for the future.
 ttstick<-t.test(conmon_individual3$correct[conmon_individual3$trialtype=="stick"] , mu=0.5, alternative = "two.sided")
 ttstick
 ttfood<-t.test(conmon_individual3$correct[conmon_individual3$trialtype=="food"] , mu=0.5, alternative = "two.sided")
 ttfood
-```
-####Comparison between food-stick and stick-food trials
 
-```{r, echo=FALSE}
 conmon_individual3 <- conmon1 %>% 
   group_by(trialtype, id) %>% 
   summarize(correct = mean(correct)) %>% 
@@ -363,14 +411,19 @@ conmon_individual3 <- conmon1 %>%
 
 tt2<-t.test(conmon_individual3$correct[conmon_individual3$trialtype=="food"], conmon_individual3$correct[conmon_individual3$trialtype=="stick"], paired = TRUE, alternative = "two.sided")
 tt2
+
 ```
-**Monkeys performed significantly better in food-stick trials than stick-food trials and they were above chance in food-stick and at chance in stick-food trials.**
+
 
 ##Plotting the findings
 ```{r, echo=FALSE}
 p1 <- ggplot(data=conmon_separate, aes(x=phase, y=correct, group=phase)) + geom_boxplot()+ylim(0,1)+  geom_point(size = conmon_individual2$n, colour = "darkgrey", alpha=0.3) +labs(x="",y="Mean number of correct choices")+theme_few()+ggtitle("Phase")+geom_hline(yintercept=0.5, linetype="dashed", color = "red")
 p1
 
+```
+
+```{r, include=FALSE}
+#This is trialtype graph. Include it only if it makes sense to further analyze this. Keeping it for the future.
 p2 <- ggplot(data=conmon_individual3, aes(x=trialtype, y=correct, group=trialtype)) +geom_boxplot()+ylim(0,1)+geom_point(size = conmon_individual3$n, colour = "darkgrey", alpha=0.3) +geom_line(lty=2)+labs(x="",y="Mean number of correct choices")+ theme_few()+ggtitle("Trial type")+geom_hline(yintercept=0.5, linetype="dashed", color = "red")
 p2
 
