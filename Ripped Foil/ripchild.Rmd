@@ -460,15 +460,27 @@ ripchild_separate2 <- ripchild %>%
     add_count(correct)
 
 plot.int=seq(from=min(ripchild_separate2$agemonths),
-             to=max(ripchild_separate2$agemonths),length.out=272)
+             to=max(ripchild_separate2$agemonths),length.out=68)
 
-scatter.int2<-ggplot(ripchild_separate2, aes(x=plot.int, y=boot.res.int$ci.predicted$fitted, group=order3)) +
- geom_point(aes(x=agemonths, y=correct), size=ripchild_separate2$n, alpha=0.8) +    facet_wrap(~order3) + geom_ribbon(data=boot.res.int$ci.predicted, aes(x=plot.int, y=boot.res.int$ci.predicted$fitted, ymin=boot.res.int$ci.predicted$lower.cl, ymax=boot.res.int$ci.predicted$upper.cl, group=boot.res.int$ci.predicted$order3),fill="grey", alpha=0.5) + geom_line(data=boot.res.int$ci.predicted, aes(y=boot.res.int$ci.predicted$fitted), lty=2)+
-  theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ xlab("Age in months")+ ylab("Mean correct responses")+ 
-  ylim(0,1)+
-  geom_hline(yintercept=0.50, color='red', linetype="dashed")
-  
-  scatter.int2
+ci.data<-boot.res.int$ci.predicted#I reduced the number of values for the confidence intervals. did not match the actual data.
+toDelete<- seq(1, nrow(ci.data),2)
+ci.data<-ci.data[toDelete,]
+
+scatter.int2 <- ggplot(ci.data, aes( y = fitted)) +
+  geom_point(data=ripchild_separate2, aes(x = agemonths, y = correct), size = ripchild_separate2$n, alpha = 0.8) +
+  facet_wrap(~order3) +
+  geom_ribbon(data = ci.data%>%filter(order3=="test"), aes(x = plot.int, y = fitted, ymin = lower.cl, ymax = upper.cl, group = order3), fill = "grey", alpha = 0.5) +
+  geom_line(data = ci.data%>%filter(order3=="test"), aes(x = plot.int, y = fitted), lty = 2) +
+    geom_ribbon(data = ci.data%>%filter(order3=="transfer"), aes(x = plot.int, y = fitted, ymin = lower.cl, ymax = upper.cl, group = order3), fill = "grey", alpha = 0.5) +
+  geom_line(data = ci.data%>%filter(order3=="transfer"), aes(x = plot.int, y = fitted), lty = 2) +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  xlab("Age in months") +
+  ylab("Mean correct responses") +
+  ylim(0, 1) +
+  geom_hline(yintercept = 0.50, color = "red", linetype = "dashed")
+
+scatter.int2
 ```
 
 ####The CIs do not cover the entire range here. How can we fix this?
