@@ -99,7 +99,7 @@ hist(agg_warm2$mean, xlab="Mean score in Warm-up 2", xlim=c(0,1))
 
 ```
 
-I then aggregated the trial-by-trial data to create one score per monkey for Test and Transfer phases so I can check whether or not they are normally distributed.
+I then aggregated the trial-by-trial data to create one score per monkey for Test and Transfer phases so I can check the distribution of scores.
 
 ```{r, echo=FALSE}
 ripmon_individual <- ripmon1 %>%
@@ -137,19 +137,8 @@ hist(ripmon_test$correct, xlab="Mean score in Test", xlim=c(0,1))
 hist(ripmon_transfer$correct, xlab="Mean score in Transfer", xlim=c(0,1))
 hist(ripmon_individual$correct, xlab="Overall score (Test and Transfer)", xlim=c(0,1))
 ```
-##The tests of normality for Test and Transfer phases as well as for the overall score
-
-```{r, echo=FALSE}
-
-shapiro.test(ripmon_individual$correct)
-
-shapiro.test(ripmon_test$correct)
-
-shapiro.test(ripmon_transfer$correct)
-```
-The Shapiro-Wilk normality tests show that the data are normally distributed for Test and Transfer phases (as well as the overall scores per individual).
-
 ##Below is how performance looks in the last 16 trials of Test and Transfer
+
 ```{r, echo=FALSE}
 boxplot1 <- ggplot(ripmon_separate, aes(x=phase, y=correct)) + 
     geom_dotplot(binaxis='y', stackdir='center', dotsize=0.5) + ylim(0,1)
@@ -205,10 +194,10 @@ ydata=xx.fe.re$data
 
 ```{r, echo=TRUE}
 contr<-glmerControl(optimizer="bobyqa", optCtrl=list(maxfun=10000000))
-full=glmer(correct ~ trialtype*phase+z.trialno+z.age+sex+(1+z.trialno+phase.transfer.c+trialtype.food.c|id),data=ripmon1, family=binomial, control=contr)
+full=glmer(correct ~ trialtype*phase+z.trialno+z.age+sex+(1|id)+(0+z.trialno+phase.transfer.c+trialtype.food.c|id),data=ripmon1, family=binomial, control=contr)
 ```
 
-The full model does not include box type (the location of the blue/pink box) as a random effect anymore due to convergence issues. 
+The full model does not include box type (the location of the blue/pink box) as a random effect anymore due to convergence issues. The correlations between random slope and random intercept are not included either.
 
 ##Model assumptions
 
@@ -231,30 +220,23 @@ m.stab$detailed$warnings
 ####Multicollinearity
 
 ```{r, echo=FALSE}
-coll=lm(correct ~ trialtype*phase+z.trialno+z.age+sex, data=ripmon1)
+coll=lm(correct ~ trialtype+phase+z.trialno+z.age+sex, data=ripmon1)
 round(vif(coll),3)
 #no vif issues
-```
-
-####Overdispersion
-
-```{r, echo=FALSE}
-#overdispersion test
-overdisp.test(full)
 ```
 
 ##Null model
 
 ```{r, echo=TRUE}
-null=glmer(correct~(1+z.trialno+phase.transfer.c+trialtype.food.c|id),data=ripmon1, family=binomial, control=contr)
+null=glmer(correct~z.trialno+(1|id)+(0+z.trialno+phase.transfer.c+trialtype.food.c|id),data=ripmon1, family=binomial, control=contr)
 ```
-
-Question: I do have (1|id) as another random effect in the child model. Do I not need to include it here?
+**Added trial no to the null model to control for its effects.**
 
 ##Full and Null comparison
 ```{r, echo=FALSE}
 round(anova(null, full, test="Chisq"),3)
 ```
+**The full model is significantly different than the null model.**
 
 ##Model output
 
@@ -270,24 +252,25 @@ round(summary(full)$coefficients, 3)
 xdrop1=drop1(full, test="Chisq",control=contr)
 round(xdrop1,3)
 ```
+**There is a significant effect of sex. The interaction term is not significant.**
 
 ####Confidence intervals for the full model with the interaction
 
 ```{r, echo=FALSE}
-# ripmon_model1=boot.glmm.pred(model.res=full, excl.warnings=T, nboots=1000, para=T)
-# save.image("ripmon_model1_CIs.RData")
+ripmon_model1=boot.glmm.pred(model.res=full, excl.warnings=T, nboots=1000, para=T)
+save.image("ripmon_model1_CIs.RData")
 load("ripmon_model1_CIs.RData")
 round(ripmon_model1$ci.estimates, 3)
 
 ```
 
-**The interaction term is not significant so I will remove it from the model.**
+**I will remove the non-significant interaction term to reduce the model.**
 
 ##Reduced model without the interaction
 ##Full model 2
 
 ```{r, echo=TRUE}
-full2=glmer(correct ~ trialtype+phase+z.trialno+z.age+sex+(1+z.trialno+phase.transfer.c+trialtype.food.c|id),data=ripmon1, family=binomial, control=contr)
+full2=glmer(correct ~ trialtype+phase+z.trialno+z.age+sex+(1|id)+(0+z.trialno+phase.transfer.c+trialtype.food.c|id),data=ripmon1, family=binomial, control=contr)
 summary(full2)
 ```
 
@@ -298,14 +281,15 @@ I get the following warning: convergence code: 0, boundary (singular) fit: see ?
 ##Null model 2
 
 ```{r, echo=TRUE}
-null2<-glmer(correct~ (1+z.trialno+phase.transfer.c+trialtype.food.c|id),data=ripmon1, family=binomial, control=contr)
+null2<-glmer(correct~ z.trialno + (1|id)+(0+z.trialno+phase.transfer.c+trialtype.food.c|id),data=ripmon1, family=binomial, control=contr)
 ```
 
 ##Full and null model (2) comparion
 
 ```{r, echo=FALSE}
-round(anova(null, full2, test="Chisq"),3)
+round(anova(null2, full2, test="Chisq"),3)
 ```
+**There is a significant difference between the full and the null model.**
 
 ##Model output
 
@@ -322,6 +306,7 @@ round(summary(full2)$coefficients, 3)
 xdrop1=drop1(full2, test="Chisq",control=contr)
 round(xdrop1,3)
 ```
+**The trial type and sex are significant predictors of performance.**
 
 ```{r, include=FALSE}
 # this is for me to check the variance added by random effects, number of observations and subjects etc.
@@ -331,8 +316,8 @@ print(summary(full2), corr=FALSE)
 ####Confidence intervals for the reduced model without the interaction
 
 ```{r, echo=FALSE}
-# ripmon_model2=boot.glmm.pred(model.res=full2, excl.warnings=T, nboots=1000, para=T)
-# save.image("ripmon_model2_CIs.RData")
+ripmon_model2=boot.glmm.pred(model.res=full2, excl.warnings=T, nboots=1000, para=T)
+save.image("ripmon_model2_CIs.RData")
 load("ripmon_model2_CIs.RData")
 round(ripmon_model2$ci.estimates, 3)
 ```
@@ -356,14 +341,14 @@ ripmon_individual2<-ripmon1 %>%
   summarize(foil.correct = mean(correct)) %>% 
   add_count(foil.correct)
 
-p1 <- ggplot(data=ripmon_individual2, aes(x=phase, y=foil.correct, group=phase)) + geom_boxplot()+ylim(0,1)+  geom_point(size = ripmon_individual2$n, colour = "darkgrey", alpha=0.3) +labs(x="",y="Mean number of correct choices")+theme_few()+ggtitle("Phase")+geom_hline(yintercept=0.5, linetype="dashed", color = "red")
+p1 <- ggplot(data=ripmon_individual2, aes(x=phase, y=foil.correct, group=phase)) + geom_boxplot()+geom_point(size = ripmon_individual2$n, colour = "darkgrey", alpha=0.3) + geom_line(aes(group = id), colour = "darkgrey", alpha = 0.5)+labs(x="",y="Mean number of correct choices")+theme_few()+ggtitle("Phase")+geom_hline(yintercept=0.5, linetype="dashed", color = "red")+ylim(0,1)
 
 ripmon_individual3 <- ripmon1 %>% 
   group_by(trialtype, id) %>% 
   summarize(foil.correct = mean(correct)) %>% 
   add_count(foil.correct)
 
-p2 <- ggplot(data=ripmon_individual3, aes(x=trialtype, y=foil.correct, group=trialtype)) +geom_boxplot()+ylim(0,1)+geom_point(size = ripmon_individual3$n, colour = "darkgrey", alpha=0.3) +geom_line(lty=2)+labs(x="",y="Mean number of correct choices")+ theme_few()+ggtitle("Trial type")+geom_hline(yintercept=0.5, linetype="dashed", color = "red")
+p2 <- ggplot(data=ripmon_individual3, aes(x=trialtype, y=foil.correct, group=trialtype)) +geom_boxplot()+geom_line(aes(group = id), colour = "darkgrey", alpha = 0.5)+geom_point(size = ripmon_individual3$n, colour = "darkgrey", alpha=0.3) +geom_line(lty=2)+labs(x="",y="Mean number of correct choices")+ theme_few()+ggtitle("Trial type")+geom_hline(yintercept=0.5, linetype="dashed", color = "red")+ylim(0,1)
 
 ripmon_individual4<-ripmon1 %>% 
   group_by(sex, id) %>% 
@@ -397,77 +382,57 @@ p + geom_bar(stat = "identity", position = position_dodge(0.9), width = 0.8) + g
 
 ##Test against chance
 ####Test and transfer phase
-```{r, echo=FALSE}
-ttest<-t.test(ripmon_separate$correct[ripmon_separate$phase=="test"] , mu=0.5, alternative = "two.sided")
-ttest
-ttransfer<-t.test(ripmon_separate$correct[ripmon_separate$phase=="transfer"] , mu=0.5, alternative = "two.sided")
-ttransfer
-```
-**Performance is above chance in both Test (last 16 trials) and Transfer phases.**
 
-####Comparison between test and transfer phase
-
-```{r, echo=FALSE}
-comptt<-t.test(ripmon_separate$correct[ripmon_separate$phase=="test"], ripmon_separate$correct[ripmon_separate$phase=="transfer"], paired = TRUE, alternative = "two.sided")
-comptt
+```{r, echo=TRUE}
+testphase <-ripmon1%>%
+  filter(phase == "test")
+testchance <- glmer(correct ~ 1 + (z.trialno | id),data= testphase, family=binomial)
+summary(testchance)
 ```
-**There is no significant difference between the monkeys' performances in Test and Transfer phases.**
+
+**The intercept is significant: Performance in Test phase is above chance level.**
+
+```{r, echo=TRUE}
+transferphase <-ripmon1%>%
+  filter(phase == "transfer")
+transferchance <- glmer(correct ~ 1 + (z.trialno | id),data= transferphase, family=binomial)
+summary(transferchance)
+```
+
+**Performanc in Transfer phase is above chance level as well. And there is no significant difference between the monkeys' performances in Test and Transfer phases.**
 
 ####Trial type
 
 ```{r, echo=FALSE}
-ttypefood<-t.test(ripmon_individual3$foil.correct[ripmon_individual3$trialtype=="food"] , mu=0.5, alternative = "two.sided")
-ttypefood
-ttypestick<-t.test(ripmon_individual3$foil.correct[ripmon_individual3$trialtype=="stick"], mu=0.5, alternative="two.sided")
-ttypestick
+sticktrials <-ripmon1%>%
+  filter(trialtype == "stick")
+stickchance <- glmer(correct ~ 1 + (z.trialno | id),data= sticktrials, family=binomial)
+summary(stickchance)
 ```
 
-####Comparison between food-stick, stick-food trials
 
-```{r}
-ttype<-t.test(ripmon_individual3$foil.correct[ripmon_individual3$trialtype=="food"], ripmon_individual3$foil.correct[ripmon_individual3$trialtype=="stick"], paired = TRUE, alternative = "two.sided")
-ttype
+```{r echo=FALSE}
+foodtrials <-ripmon1%>%
+  filter(trialtype == "food")
+foodchance <- glmer(correct ~ 1 + (z.trialno | id),data= foodtrials, family=binomial)
+summary(foodchance)
 ```
-**There is a significant difference between performances in different trial types: Monkeys performed better in food-stick trials than in stick-food trials.**
-
-####Sex
-
-```{r, echo=FALSE}
-ttmale<-t.test(ripmon_individual4$foil.correct[ripmon_individual4$sex=="m"] , mu=0.5, alternative = "two.sided")
-ttmale
-ttfemale<-t.test(ripmon_individual4$foil.correct[ripmon_individual4$sex=="f"] , mu=0.5, alternative = "two.sided")
-ttfemale
-```
-####Comparison between males and females
-
-```{r, echo=FALSE}
-tsex<-t.test(ripmon_individual4$foil.correct[ripmon_individual4$sex=="m"], ripmon_individual4$foil.correct[ripmon_individual4$sex=="f"], paired = FALSE, alternative = "two.sided")
-tsex
-```
-**Males performed significantly better than females.**
-
-####Comparison between test and transfer phase
-
-```{r, echo=FALSE}
-comptt<-t.test(ripmon_separate$correct[ripmon_separate$phase=="test"], ripmon_separate$correct[ripmon_separate$phase=="transfer"], paired = TRUE, alternative = "two.sided")
-comptt
-```
-
+**There is a significant difference between performances in different trial types: monkeys performed better in food-stick trials than stick-food trials. Their performance was above chance in both.**
 
 ##First trial performance in Transfer phase
 
 ```{r, include=FALSE}
 ripmon_1st_trial <- ripmon1 %>%
-  filter(phase=="transfer" & sessionno=="1", trialno=="1") %>%
-  group_by(id, age, sex, trialtype, order) %>% 
-  summarize(correct)
+  filter(phase=="transfer" & sessionno=="1", trialno=="1")
 ```
 
 ####Performance in Trial 1 of Transfer
 ```{r, echo=TRUE}
-firsttrial <- glm(correct~age+sex+trialtype,data=ripmon_1st_trial,family=binomial(link = "logit"))
+#I am fitting a glm with binomial error structure for the first trial transfer phase analysis and not a mixed model given that it only includes one data point per subject.
+firsttrial <- glm(correct~z.age+sex+trialtype,data=ripmon_1st_trial,family=binomial(link = "logit"))
 summary(firsttrial)
 ```
+
 
 ####Is the performance above chance in first trial of Transfer?
  
