@@ -55,7 +55,7 @@ hist(ripchild$agemonths, xlab="Age in months (36-72)", ylab="Frequency")
 
 ```
 
-Next I aggregated the trial-by-trial data to create one score per child for Test and Transfer phases as well as an overall score so I can check whether they are normally distributed or not.
+Next I aggregated the trial-by-trial data to create one score per child for Test and Transfer phases as well as an overall score so I can check the distributions of scores.
 
 ```{r warning=FALSE}
 ripchild_individual <- ripchild %>%
@@ -84,34 +84,6 @@ hist(ripchild_test$correct, xlab="Mean score in Test", xlim=c(0,1))
 hist(ripchild_transfer$correct, xlab="Mean score in Transfer", xlim=c(0,1))
 hist(ripchild_individual$correct, xlab="Overall score (Test and Transfer)", xlim=c(0,1))
 ```
-
-##The tests of normality for Test and Transfer phases as well as for the overall score
-
-```{r echo=FALSE}
-shapiro.test(ripchild_individual$correct)
-
-shapiro.test(ripchild_test$correct)
-
-shapiro.test(ripchild_transfer$correct)
-```
-
-The Shapiro-Wilk normality tests confirm that the data are not normally distributed for Test and Transfer phases (neither for an overall score).
-
-##Below is the how children in different ages perform in test and transfer.
-```{r echo=FALSE}
-testBYage<-ggplot(ripchild_test, aes(agemonths, correct))
-s1<-testBYage + geom_point(aes(), position="jitter") + labs(x= "Age in months", y= "Mean Performance in Test")+ 
-  geom_smooth(method ="lm", alpha=0.2)+
-  theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+scale_y_continuous(limits=c(0,1),oob=scales::rescale_none)
-
-transferBYage<-ggplot(ripchild_transfer, aes(agemonths, correct))
-s2<-transferBYage + geom_point(aes(), position="jitter") + labs(x= "Age in months", y= "Mean Performance in Transfer") + 
-  geom_smooth(method ="lm", alpha=0.2) +
-  theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+scale_y_continuous(limits=c(0,1),oob=scales::rescale_none)
-
-grid.arrange(s1, s2, nrow = 1, heights=unit(100, "mm"))
-```
-The regression line (with a 95% CI) for the Transfer phase is steeper than the Test phase. Younger children seem to be doing worse in Transfer than in Test.
 
 ##Preparation of the data for running the GLMM
 
@@ -170,7 +142,6 @@ ydata=xx.fe.re$data
 ```{r echo=TRUE}
 contr<-glmerControl(optimizer="bobyqa", optCtrl=list(maxfun=10000000))
 full<-glmer(correct ~ trialtype*order3+z.trialno+z.age*order3+sex+(1|id)+(0+z.trialno+order3.transfer.c+trialtype.sticker.c|id),data=ripchild, family=binomial, control=contr)
-
 ```
 
 The full model does not include box type (the location of the blue/pink box) as a random effect anymore due to convergence issues. But there is a singular fit warning here as you can see.
@@ -196,23 +167,17 @@ m.stab$detailed$warnings
 ####Multicollinearity
 
 ```{r echo=FALSE}
-coll=lm(correct ~ trialtype*order3+z.trialno+order3*z.age+sex, data=ripchild)
+coll=lm(correct ~ trialtype+order3+z.trialno+z.age+sex, data=ripchild)
 round(vif(coll),3)
 #no vif issues
 ```
 
-####Overdispersion
-
-```{r echo=FALSE}
-#overdispersion test
-overdisp.test(full)
-```
-None of these seem to show a problem- although not sure how to interpret stability.
+None of these seem to show a problem.
 
 ##Null model
 
 ```{r echo=TRUE}
-null<-glmer(correct~ 1+(1|id)+(0+z.trialno+order3.transfer.c+trialtype.sticker.c|id),data=ripchild, family=binomial, control=contr)
+null<-glmer(correct~ z.trialno+(1|id)+(0+z.trialno+order3.transfer.c+trialtype.sticker.c|id),data=ripchild, family=binomial, control=contr)
 ```
 
 ##Full and Null comparison
@@ -261,7 +226,7 @@ full2=glmer(correct ~ trialtype+order3+z.trialno+z.age+sex+(1|id)+(0+z.trialno+o
 ##Null model
 
 ```{r echo=TRUE}
-null2<-glmer(correct~ 1+(1|id)+(0+z.trialno+order3.transfer.c+trialtype.sticker.c|id),data=ripchild, family=binomial, control=contr)
+null2<-glmer(correct~ z.trialno+(1|id)+(0+z.trialno+order3.transfer.c+trialtype.sticker.c|id),data=ripchild, family=binomial, control=contr)
 ```
 
 ####Full 2 and null comparision
@@ -288,7 +253,7 @@ xdrop1=drop1(full2, test="Chisq",control=contr)
 round(xdrop1,3)
 ```
 
-**Age emerges as a significant predictor of scores.**
+**Age emerges as a significant predictor of scores. There also seems to be a pattern of scores varying by trial type.**
 
 ```{r include=FALSE}
 # this is for me to check the variance added by random effects, number of observations and subjects etc.
@@ -390,7 +355,7 @@ scatter
 
 ```
 
-
+**Performance of younger children (up until 50 months of age) seem to be at or below chance level in this task. Older children seem to be doing better although there is a lot of variation (some are performing at ceiling level while some others are below chance).**
 
 ```{r include=FALSE}
 # From Eva - need to put these top three lines, otherwise get an error msg.
@@ -462,7 +427,7 @@ ripchild_separate2 <- ripchild %>%
 plot.int=seq(from=min(ripchild_separate2$agemonths),
              to=max(ripchild_separate2$agemonths),length.out=68)
 
-ci.data<-boot.res.int$ci.predicted#I reduced the number of values for the confidence intervals. did not match the actual data.
+ci.data<-boot.res.int$ci.predicted #I reduced the number of values for the confidence intervals. did not match the actual data.
 toDelete<- seq(1, nrow(ci.data),2)
 ci.data<-ci.data[toDelete,]
 
@@ -483,7 +448,8 @@ scatter.int2 <- ggplot(ci.data, aes( y = fitted)) +
 scatter.int2
 ```
 
-####The CIs do not cover the entire range here. How can we fix this?
+**Younger children's (up until 50 months of age) scores in both test and transfer do not seem to differ from chance level compared to older children. The slope for the Transfer phase is also steeper than in Test level  meaning that the difference between the younger and older children's performance in Transfer is larger.**
+This is great to see but we will leave this to the supplementary materials.
 
 
 ##First trial performance in Transfer phase
