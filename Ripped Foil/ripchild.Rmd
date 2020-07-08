@@ -57,7 +57,7 @@ hist(ripchild$agemonths, xlab="Age in months (36-72)", ylab="Frequency")
 
 Next I aggregated the trial-by-trial data to create one score per child for Test and Transfer phases as well as an overall score so I can check the distributions of scores.
 
-```{r warning=FALSE}
+```{r echo=FALSE}
 ripchild_individual <- ripchild %>%
   group_by(id, age, agemonths) %>% 
   summarize(correct = mean(correct))%>%

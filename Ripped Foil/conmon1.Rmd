@@ -102,7 +102,7 @@ hist(agg_warm2$mean, xlab="Mean score in Warm-up 2", xlim=c(0,1), ylim=c(0,12))
 ```
 **The data shows that after the initial warm up phase, the monkeys very quickly learnt to find the reward in the patterned cup.**
 
-I then aggregated the trial-by-trial data to create one score per monkey for Test and Transfer phases so I can check whether or not they are normally distributed.
+I then aggregated the trial-by-trial data to create one score per monkey for Test and Transfer phases so I can see the distribution of scores.
 
 ```{r, echo=FALSE}
 conmon_individual <- conmon1 %>%
@@ -140,17 +140,6 @@ hist(conmon_test$correct, xlab="Mean score in Test", xlim=c(0,1))
 hist(conmon_transfer$correct, xlab="Mean score in Transfer", xlim=c(0,1))
 hist(conmon_individual$correct, xlab="Overall score (Test and Transfer)", xlim=c(0,1))
 ```
-##The tests of normality for Test and Transfer phases as well as for the overall score
-
-```{r, echo=FALSE}
-
-shapiro.test(conmon_individual$correct)
-
-shapiro.test(conmon_test$correct)
-
-shapiro.test(conmon_transfer$correct)
-```
-The Shapiro-Wilk normality tests show that the data are not normally distributed for Test and Transfer phases but it is normal for the overall scores per individual.
 
 ##Below is how performance looks in the last 16 trials of Test and Transfer
 ```{r, echo=FALSE}
@@ -195,7 +184,7 @@ source("./Roger_functions/boot_glmm.r")
 
 ```{r, echo=TRUE}
 contr<-glmerControl(optimizer="bobyqa", optCtrl=list(maxfun=10000000))
-full=glmer(correct ~ trialtype*phase+z.trialno+z.age+sex+(1+z.trialno+phase.transfer.c+trialtype.food.c|id),data=conmon1, family=binomial, control=contr)
+full=glmer(correct ~ trialtype*phase+z.trialno+z.age+sex+(1|id)+(0+z.trialno+phase.transfer.c+trialtype.food.c|id),data=conmon1, family=binomial, control=contr)
 ```
 
 The full model does not include box type (the location of the blue/pink box) as a random effect anymore due to convergence issues. There is the singular fit warning here and throughout though.
@@ -212,34 +201,27 @@ ranef.diagn.plot(full)
 
 ```{r, echo=FALSE}
 #summary reveals min and max of the estimates obtained after casewise deletion of levels of random effects together with the original estimates.
-m.stab=glmm.model.stab(model.res=full, contr=contr)
-m.stab.plot(m.stab$summary[,-1])
-m.stab$summary
-m.stab$detailed$warnings
+# m.stab=glmm.model.stab(model.res=full, contr=contr)
+# m.stab.plot(m.stab$summary[,-1])
+# m.stab$summary
+# m.stab$detailed$warnings
 ```
 
 ####Multicollinearity
 
 ```{r, echo=FALSE}
-coll=lm(correct ~ trialtype*phase+z.trialno+z.age+sex, data=conmon1)
+coll=lm(correct ~ trialtype+phase+z.trialno+z.age+sex, data=conmon1)
 round(vif(coll),3)
 #no vif issues
-```
-
-####Overdispersion
-
-```{r, echo=FALSE}
-#overdispersion test
-overdisp.test(full)
 ```
 
 ##Null model
 
 ```{r, echo=TRUE}
-null=glmer(correct~(1+z.trialno+phase.transfer.c+trialtype.food.c|id),data=conmon1, family=binomial, control=contr)
+null=glmer(correct~ z.trialno + (1|id)+(0+z.trialno+phase.transfer.c+trialtype.food.c|id),data=conmon1, family=binomial, control=contr)
 ```
+Trialno is added to the null model.
 
-**Question: I do have (1|id) as another random effect in the child model. Do I not need to include it here?**
 
 ##Full and Null comparison
 ```{r, echo=FALSE}
@@ -261,40 +243,36 @@ xdrop1=drop1(full, test="Chisq",control=contr)
 round(xdrop1,3)
 ```
 
+
+```{r, include=FALSE}
 ####Confidence intervals for the full model with the interaction
 
-```{r, echo=FALSE}
 # conmon_model1=boot.glmm.pred(model.res=full, excl.warnings=T, nboots=1000, para=T)
 # save.image("conmon_model1_CIs.RData")
-load("conmon_model1_CIs.RData")
-round(conmon_model1$ci.estimates, 3)
-
+# load("conmon_model1_CIs.RData")
+# round(conmon_model1$ci.estimates, 3)
 ```
 
-**The null and full models are not significantly different from each other. But the interaction term is not significant. I will remove this next to see if it improves the model.**
+**The null and full models are significantly different from each other. But the interaction term is not significant. I will remove this next to see if it improves the model.**
 
 ##Reduced model without the interaction
 ##Full model 2
-
 ```{r, echo=TRUE}
-full2=glmer(correct ~ trialtype+phase+z.trialno+z.age+sex+(1+z.trialno+phase.transfer.c+trialtype.food.c|id),data=conmon1, family=binomial, control=contr)
+full2=glmer(correct ~ trialtype+phase+z.trialno+z.age+sex+(1|id)+(0+z.trialno+phase.transfer.c+trialtype.food.c|id),data=conmon1, family=binomial, control=contr)
 summary(full2)
 ```
 
 I get the following warning: convergence code: 0, boundary (singular) fit: see ?isSingular.
 
-**The model shows a significant effect of trial type**
-
 ##Null model 2
 
 ```{r, echo=TRUE}
-null2<-glmer(correct~ (1+z.trialno+phase.transfer.c+trialtype.food.c|id),data=conmon1, family=binomial, control=contr)
+null2<-glmer(correct~z.trialno+(1|id)+(0+z.trialno+phase.transfer.c+trialtype.food.c|id),data=conmon1, family=binomial, control=contr)
 ```
 
 ##Full and null model (2) comparion
-
 ```{r, echo=FALSE}
-round(anova(null, full2, test="Chisq"),3)
+round(anova(null2, full2, test="Chisq"),3)
 ```
 
 ##Model output
@@ -312,145 +290,96 @@ round(summary(full2)$coefficients, 3)
 xdrop1=drop1(full2, test="Chisq",control=contr)
 round(xdrop1,3)
 ```
-**The model without the interaction is not significantly different from the null model either.**
-**Question: Since the model is not a good fit to the data, I cannot talk about the significant effect of trial type here, is this correct?**
+**The model without the interaction is significantly different from the null model too. There is no effect of phase in this case, but trial type has a significant effect on performance. There is a trend for age to have an effect on performance as well but I'm not going to further explore this as we had no apriori expectations about age for monkeys.**
 
 ```{r, include=FALSE}
 # this is for me to check the variance added by random effects, number of observations and subjects etc.
 print(summary(full2), corr=FALSE)
 ```
 
+
+```{r, include=FALSE}
 ####Confidence intervals for the reduced model without the interaction
 
-```{r, echo=FALSE}
 # conmon_model2=boot.glmm.pred(model.res=full2, excl.warnings=T, nboots=1000, para=T)
 # save.image("conmon_model2_CIs.RData")
-load("conmon_model2_CIs.RData")
-round(conmon_model2$ci.estimates, 3)
+# load("conmon_model2_CIs.RData")
+# round(conmon_model2$ci.estimates, 3)
 ```
-
-##Tests against chance
-####Test and transfer phases
-```{r}
-# install.packages("exactRankTests")
-library(exactRankTests)
-
-better.wilcox=function(var1){
-  test.data=data.frame(var1)
-  test.data=subset( test.data, var1 !=0.5)
-  N=nrow(test.data)
-  w.res=wilcox.exact (test.data$var1, paired=F, exact=T, mu=0.5, alternative = c("two.sided"))
-  wT=w.res$statistic
-  wT=max(c(wT, N*(N+1)/2- wT))
-  return(data.frame(T.plus=wT, N=N, P=w.res$p.value) )}
-
-better.wilcox2=function(var1, var2){
-  test.data=data.frame(var1, var2)
-  test.data=subset( test.data, var1 != var2)
-  N=nrow(test.data)
-  w.res=wilcox.exact (test.data$var1, test.data$var2, paired=T, exact=T, alternative = c("two.sided"))
-  wT=w.res$statistic
-  wT=max(c(wT, N*(N+1)/2- wT))
-  return(data.frame(T.plus=wT, N=N, P=w.res$p.value) )}
-
-#Test phase
-wt1<-better.wilcox(conmon_test$correct) 
-wt1
-median = round(median(conmon_test$correct), 2)
-median 
-
-wt2<-better.wilcox(conmon_transfer$correct) 
-wt2
-median2 = round(median(conmon_transfer$correct), 2)
-median2 
-```
-**Neither test nor transfer performances are different from chance. Any idea why I get wrong sample sizes here?**
-
-##Mann-Whitney U-Test  
-
-```{r, echo=FALSE}
-mt<-wilcox.exact(conmon_separate$correct~conmon_separate$phase,exact=T)
-mt
-#The test statistic is 'U', despite labelled 'W'but it is not always the smaller of the two U-values to get the smaller (its a convention to indicate this) use:
-u_mt<-min(c(mt$statistic, prod(table(conmon_separate$phase))-mt$statistic))
-u_mt
-#to get the sample sizes use:
-n1_mt<-table(conmon_separate$phase)[1]
-n2_mt<-table(conmon_separate$phase)[2]
-n1_mt
-n2_mt
-```
-**There is no signficiant difference between  the test and transfer performances either.**
-
-
-```{r, include=FALSE}
-#this is for normally distributed samples. Mine is not but I'll keep it for future.
-ttest<-t.test(conmon_separate$correct[conmon_separate$phase=="pattern-test"] , mu=0.5, alternative = "two.sided")
-ttest
-ttransfer<-t.test(conmon_separate$correct[conmon_separate$phase=="pattern-transfer"] , mu=0.5, alternative = "two.sided")
-ttransfer
-```
-
-```{r, include=FALSE}
-#this is for normally distributed samples. Mine is not but I'll keep it for future.
-comptt<-t.test(conmon_separate$correct[conmon_separate$phase=="pattern-test"], conmon_separate$correct[conmon_separate$phase=="pattern-transfer"], paired = TRUE, alternative = "two.sided")
-comptt
-```
-
-```{r, include=FALSE}
-#It doesn't make sense to explore trial type because the model was not significant. and even if I did, I should use wilcoxon test as the sample is not normally distributed. But keeping this for the future.
-ttstick<-t.test(conmon_individual3$correct[conmon_individual3$trialtype=="stick"] , mu=0.5, alternative = "two.sided")
-ttstick
-ttfood<-t.test(conmon_individual3$correct[conmon_individual3$trialtype=="food"] , mu=0.5, alternative = "two.sided")
-ttfood
-
-conmon_individual3 <- conmon1 %>% 
-  group_by(trialtype, id) %>% 
-  summarize(correct = mean(correct)) %>% 
-  add_count(correct)
-
-tt2<-t.test(conmon_individual3$correct[conmon_individual3$trialtype=="food"], conmon_individual3$correct[conmon_individual3$trialtype=="stick"], paired = TRUE, alternative = "two.sided")
-tt2
-
-```
-
 
 ##Plotting the findings
 ```{r, echo=FALSE}
-p1 <- ggplot(data=conmon_separate, aes(x=phase, y=correct, group=phase)) + geom_boxplot()+ylim(0,1)+  geom_point(size = conmon_individual2$n, colour = "darkgrey", alpha=0.3) +labs(x="",y="Mean number of correct choices")+theme_few()+ggtitle("Phase")+geom_hline(yintercept=0.5, linetype="dashed", color = "red")
-p1
+p1 <- ggplot(data=conmon_separate, aes(x=phase, y=correct, group=phase)) + geom_boxplot()+ylim(0,1)+geom_point(size = conmon_separate$n, colour = "darkgrey", alpha=0.3) + geom_line(aes(group = id), colour = "darkgrey", alpha = 0.5)+labs(x="",y="Mean number of correct choices")+theme_few()+ggtitle("Phase")+geom_hline(yintercept=0.5, linetype="dashed", color = "red")
 
-```
+conmon_individual2 <- conmon1 %>% 
+  group_by(trialtype, id) %>% 
+  summarize(correct = mean(correct)) %>% 
+  add_count(correct)
+p2 <- ggplot(data=conmon_individual2, aes(x=trialtype, y=correct, group=trialtype)) +geom_boxplot()+ylim(0,1)+geom_point(size = conmon_individual2$n, colour = "darkgrey", alpha=0.3) +geom_line(aes(group = id), colour = "darkgrey", alpha = 0.5)+labs(x="",y="Mean number of correct choices")+ theme_few()+ggtitle("Trial type")+geom_hline(yintercept=0.5, linetype="dashed", color = "red")
 
-```{r, include=FALSE}
-#This is trialtype graph. Include it only if it makes sense to further analyze this. Keeping it for the future.
-p2 <- ggplot(data=conmon_individual3, aes(x=trialtype, y=correct, group=trialtype)) +geom_boxplot()+ylim(0,1)+geom_point(size = conmon_individual3$n, colour = "darkgrey", alpha=0.3) +geom_line(lty=2)+labs(x="",y="Mean number of correct choices")+ theme_few()+ggtitle("Trial type")+geom_hline(yintercept=0.5, linetype="dashed", color = "red")
-p2
 
 grid.arrange(p1, p2, nrow = 1, heights=unit(100, "mm"))
 ```
 
 
-##First trial performance in Transfer phase
+##Test against chance
+####Test and transfer phase
 
-```{r, include=FALSE}
+```{r, echo=TRUE}
+testphase <-conmon1%>%
+  filter(phase == "pattern-test")
+testchance <- glmer(correct ~ 1 + (z.trialno | id), data= testphase, family=binomial)
+summary(testchance)
+```
+```{r, echo=TRUE}
+transferphase <-conmon1%>%
+  filter(phase == "pattern-transfer")
+transferchance <- glmer(correct ~ 1 + (z.trialno | id), data= transferphase, family=binomial)
+summary(transferchance)
+```
+This is a change now and is interesting! Performance at Test seems to be above chance **(barely)** and Transfer is not **(barely?)**. The thing is most of the monkeys performed at chance in Test, but there are 3 who did really well and I suspect they are bringing the mean up (**Q:** Is the intercept a good test in such cases?). Moreover, these monkeys got the food-stick trials in Test. When they switched in Transfer, performance dropped. Conversely the ones who did well in Transfer were the ones who got food-stick trials. It is incredible that phase and trial type interaction wasn't significant in the first model...
+This is a very tricky finding. I think it shows that monkeys can perform well in this task (both patterned and ripped) when the memory demands are low and they do not need to engage in any reasoning at all. And I think this jeopardizes the positive findings from the ripped foil a little but doesn't explain it fully as they performed much better in that task than here. Looking forward to discussing these!
+
+
+####Trial type
+
+```{r, echo=FALSE}
+sticktrials <-conmon1%>%
+  filter(trialtype == "stick")
+stickchance <- glmer(correct ~ 1 + (z.trialno | id),data= sticktrials, family=binomial)
+summary(stickchance)
+
+foodtrials <-conmon1%>%
+  filter(trialtype == "food")
+foodchance <- glmer(correct ~ 1 + (z.trialno | id),data= foodtrials, family=binomial)
+summary(foodchance)
+```
+Performance is not different from chance level in stick-food trials and it is above chance in food-stick trials as it is also clearly seen in the plot.
+
+##Correcting the p-values for the post-hoc tests using Hochberg correction (in the order: test, transfer, stick-food, food-stick)
+
+```{r, echo=TRUE}
+pvalues <- c(0.0463, 0.0811, 0.789, 0.00746)
+p.adjust(pvalues, method="hochberg")
+```
+**OK, maybe I spoke too soon about the Test, Transfer phase results here- the corrected p-values show that these are not significant, only the performance in food-stick trials is above chance. But we may decide to discuss the performance of those 5 monkeys (3 in test and 2 in transfer) who did really well in this task regardless of p-values, right?**
+
+
+####How about the first trial performance in Transfer phase: Is performance above chance?
+
+```{r, echo=TRUE}
 conmon_1st_trial <- conmon1 %>%
-  filter(phase=="pattern-transfer" & sessionno=="1", trialno=="1") %>%
-  group_by(id, age, sex, trialtype, phase) %>% 
-  summarize(correct)
+  filter(phase=="pattern-transfer" & sessionno=="1", trialno=="1")
+#I am fitting a glm with binomial error structure for the first trial transfer phase analysis and not a mixed model given that it only includes one data point per subject.
+firsttrialchance <- glm(correct ~ 1, data= conmon_1st_trial, family=binomial)
+summary(firsttrialchance)
 ```
 
-####Is the performance above chance in first trial of Transfer?
- 
-```{r,echo=FALSE}
-firsttrial_trans<-t.test(conmon_1st_trial$correct, mu=0.5, alternative = "two.sided")
-firsttrial_trans
-```
 **No, performance in the first trial of transfer does not differ from chance level.**
 
-##Bar graph
 
-```{r}
+
+```{r, include=FALSE}
 ###monkey figure similar to children
 
 controlaggregate <- aggregate(conmon1$correct, by = list(phase = conmon1$phase), function(x) c(mean = mean(x), sd = sd(x), n = length(x)))
