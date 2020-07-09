@@ -374,6 +374,12 @@ conmon_1st_trial <- conmon1 %>%
 firsttrialchance <- glm(correct ~ 1, data= conmon_1st_trial, family=binomial)
 summary(firsttrialchance)
 ```
+```{r}
+sum(conmon_1st_trial$correct)
+length(conmon_1st_trial$correct)
+
+binom.test(x=sum(conmon_1st_trial$correct), n=length(conmon_1st_trial$correct), p=0.5, alternative = "two.sided")
+```
 
 **No, performance in the first trial of transfer does not differ from chance level.**
 
