@@ -433,10 +433,13 @@ p.adjust(pvalues, method="hochberg")
 ```{r, echo=TRUE}
 ripmon_1st_trial <- ripmon1 %>%
   filter(phase=="transfer" & sessionno=="1", trialno=="1")
-#I am fitting a glm with binomial error structure for the first trial transfer phase analysis and not a mixed model given that it only includes one data point per subject.
-firsttrialchance <- glm(correct ~ 1, data= ripmon_1st_trial, family=binomial)
-summary(firsttrialchance)
+
+sum(ripmon_1st_trial$correct)
+length(ripmon_1st_trial$correct)
+
+binom.test(x=sum(ripmon_1st_trial$correct), n=length(ripmon_1st_trial$correct), p=0.5, alternative = "two.sided")
 ```
+
 **Question:** Is this the correct way of looking at chance performance here? Just in case, I'm including the t-test here as well.
 **No, performance in the first trial of transfer phase does not differ from chance**
 
