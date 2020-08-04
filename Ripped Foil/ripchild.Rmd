@@ -48,6 +48,41 @@ ripchild$sex<-as.factor(ripchild$sex)
 str(ripchild)
 ```
 
+```{r}
+ripchild_penfirst <- ripchild %>%
+  filter(order=="penfirst") %>%
+  group_by(id, sex, agemonths) %>% 
+  summarize(correct = mean(correct))
+boys_pen <- subset(ripchild_penfirst, sex == "2")
+mean(boys_pen$agemonths)
+sd(boys_pen$agemonths)
+min(boys_pen$agemonths)
+max(boys_pen$agemonths)
+girls_pen <- subset(ripchild_penfirst, sex == "1")
+mean(girls_pen$agemonths)
+sd(girls_pen$agemonths)
+min(girls_pen$agemonths)
+max(girls_pen$agemonths)
+
+
+ripchild_stickerfirst <- ripchild %>%
+  filter(order=="stickerfirst") %>%
+  group_by(id, sex, agemonths) %>% 
+  summarize(correct = mean(correct))
+boys_sticker <- subset(ripchild_stickerfirst, sex == "2")
+mean(boys_sticker$agemonths)
+sd(boys_sticker$agemonths)
+min(boys_sticker$agemonths)
+max(boys_sticker$agemonths)
+girls_sticker <- subset(ripchild_stickerfirst, sex == "1")
+mean(girls_sticker$agemonths)
+sd(girls_sticker$agemonths)
+min(girls_sticker$agemonths)
+max(girls_sticker$agemonths)
+```
+
+
+
 We decided to use age as a continuous variable (age in months) in our main analyses rather than categorical to have more power.The distribution of age:
 
 ```{r pressure, echo=FALSE}
@@ -346,7 +381,7 @@ plot.xvals=seq(from=min(ripchild_individual$agemonths),to=max(ripchild_individua
 
 scatter<-ggplot(ripchild_individual, aes(x=plot.xvals, y=boot.res$ci.predicted$fitted)) + geom_point(aes(x=agemonths, y=correct), size=ripchild_individual$n, alpha=0.8)+
 geom_ribbon(data=boot.res$ci.predicted, aes(x=plot.xvals, ymin=boot.res$ci.predicted$lower.cl,ymax=boot.res$ci.predicted$upper.cl), fill="grey", alpha=0.5)+
-geom_line(data=boot.res$ci.predicted, aes(x = plot.xvals, y=boot.res$ci.predicted$fitted), lty=2)+
+geom_line(data=boot.res$ci.predicted, aes(x = plot.xvals, y=boot.res$ci.predicted$fitted), lty=2)+ scale_x_continuous(breaks = seq(from = 36, to = 72, by = 6)) +  geom_segment(aes(x = 42, y = 0, xend = 42, yend = 0.5), arrow=arrow(length = unit(0.2, "cm")), colour="red")+
 theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ xlab("Age in months")+ ylab("Mean correct responses")+ 
   ylim(0,1)+
   geom_hline(yintercept=0.50, color='red', linetype="dashed")
@@ -431,13 +466,13 @@ ci.data<-boot.res.int$ci.predicted #I reduced the number of values for the confi
 toDelete<- seq(1, nrow(ci.data),2)
 ci.data<-ci.data[toDelete,]
 
-scatter.int2 <- ggplot(ci.data, aes( y = fitted)) +
+scatter.int2 <- ggplot(ci.data, aes(y = fitted)) +
   geom_point(data=ripchild_separate2, aes(x = agemonths, y = correct), size = ripchild_separate2$n, alpha = 0.8) +
-  facet_wrap(~order3) +
+  facet_wrap(~order3) + geom_segment(mapping=aes(x=44, xend=44, y=0, yend=0.5, order3="transfer"), arrow=arrow(length=unit(0.2,"cm")))+ geom_segment(mapping=aes(x=40, xend=40, y=0, yend=0.5, order3="test"), arrow=arrow(length=unit(0.2,"cm"))) +
   geom_ribbon(data = ci.data%>%filter(order3=="test"), aes(x = plot.int, y = fitted, ymin = lower.cl, ymax = upper.cl, group = order3), fill = "grey", alpha = 0.5) +
   geom_line(data = ci.data%>%filter(order3=="test"), aes(x = plot.int, y = fitted), lty = 2) +
     geom_ribbon(data = ci.data%>%filter(order3=="transfer"), aes(x = plot.int, y = fitted, ymin = lower.cl, ymax = upper.cl, group = order3), fill = "grey", alpha = 0.5) +
-  geom_line(data = ci.data%>%filter(order3=="transfer"), aes(x = plot.int, y = fitted), lty = 2) +
+  geom_line(data = ci.data%>%filter(order3=="transfer"), aes(x = plot.int, y = fitted), lty = 2) + scale_x_continuous(breaks = seq(from = 36, to = 72, by = 4)) +
   theme_bw() +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   xlab("Age in months") +
@@ -468,6 +503,9 @@ str(ripchild_1st_trial)
 ####Performance in trial 1 of Transfer phase
 
 ```{r echo=TRUE}
+##binomial test for the first trial performance in Transfer (CV asked for this and Amanda wants to stress the overall performance in Transfer trial 1)
+binom.test(x=sum(ripchild_1st_trial$correct), n=length(ripchild_1st_trial$correct), p=0.5, alternative = "two.sided")
+
 firsttrial <- glm(correct~z.age+sex+trialtype,data=ripchild_1st_trial,family=binomial(link = "logit"))
 summary(firsttrial)
 anova(firsttrial, test="Chisq")
@@ -493,6 +531,14 @@ table(openended$explanation)
 oequestion <- glm(explanation~z.age, data=openended, family=binomial(link = "logit"))
 summary(oequestion)
 anova(oequestion, test="Chisq")
+
+#analysis of the open ended questions again after CV comments
+oequestion <- glm(explanation~z.age, data=openended, family=binomial(link = "logit"))
+nullopen <- glm(explanation ~ 1, data=openended, family=binomial(link="logit"))
+anova(nullopen, oequestion, test="Chisq")
+summary(oequestion)$coefficients
+confint(object=oequestion)
+cbind(coefficients(oequestion), confint(object=oequestion))
 ```
 
 ```{r}
