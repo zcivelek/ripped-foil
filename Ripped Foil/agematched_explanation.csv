@@ -1,0 +1,33 @@
+id,age,ageyears,agemonths,sex,order,boxtype,answer,explanation,transfer,overall
+15,4,4.583333333,55,1,penfirst,blue-right,there was a hole in there,1,0.875,0.875
+21,5,5.144736842,61.73684211,1,stickerfirst,blue-right,they made holes,1,1,1
+33,4,4.617324561,55.40789474,1,stickerfirst,pink-right,it got popped,1,0.875,0.9375
+34,4,4.405701754,52.86842105,2,stickerfirst,pink-right,it got broken,1,1,1
+41,5,5.191337719,62.29605263,2,stickerfirst,blue-right,followed the pen and the sticker. It got ripped,1,1,1
+45,4,4.128289474,49.53947368,2,penfirst,pink-right,I saw the holes,1,0.875,0.9375
+55,4,4.782894737,57.39473684,2,penfirst,blue-right,I watched you pop it,1,1,1
+57,5,5.288377193,63.46052632,1,stickerfirst,pink-right,I saw you pop,1,0.875,0.875
+58,4,4.030153509,48.36184211,1,stickerfirst,blue-right,I saw you poke,1,0.875,0.875
+64,5,5.083333333,61,2,stickerfirst,blue-right,you made a hole with the pen,1,0.75,0.8125
+66,5,5.535635965,66.42763158,2,stickerfirst,pink-right,you made a hole with the pen but I can't remember,1,0.5,0.375
+72,4,4.669407895,56.03289474,2,stickerfirst,pink-right,you smashed it when you put it in,1,0.875,0.9375
+85,5,5.639254386,67.67105263,1,penfirst,pink-right,made popping gesture with foil,1,0.75,0.75
+87,4,4.402960526,52.83552632,2,stickerfirst,blue-right,I saw you crack it,1,1,1
+88,5,5.262061404,63.14473684,1,stickerfirst,pink-right,I remembered where it went,1,0.875,0.9375
+92,5,5.04495614,60.53947368,1,stickerfirst,pink-right,because you did pen first,1,0.875,0.9375
+16,4,4.641995614,55.70394737,2,stickerfirst,blue-right,"in there, blue and pink",0,0.625,0.75
+17,5,5.278508772,63.34210526,2,penfirst,blue-right,"I saw the stickers go into the cups - I don't know to ""but how did you know which cup it went in?""",0,1,1
+22,5,5.53125,66.375,2,stickerfirst,blue-right,I saw your hand going into the cups,0,1,1
+32,5,5.222587719,62.67105263,2,penfirst,pink-right,I don't know,0,0.5,0.6875
+49,4,4.055921053,48.67105263,1,penfirst,pink-right,I heard it,0,1,0.75
+59,4,4.791118421,57.49342105,2,penfirst,blue-right,"I'm an expert, easy peasy",0,0.5,0.5
+65,5,,67.2,2,penfirst,blue-right,my brain worked. I don't know,0,1,1
+73,4,4.605263158,55.26315789,1,stickerfirst,pink-right,it was tricky,0,0.5,0.6875
+78,4,4.132675439,49.59210526,1,stickerfirst,blue-right,because you put it in the same cup,0,0.375,0.375
+83,4,4.580592105,54.96710526,2,penfirst,blue-right,"doesn't speak much english, couldn't explain",0,0.75,0.8125
+89,4,4.491776316,53.90131579,2,penfirst,blue-right,blue one. Couldn't explain,0,0.5,0.3125
+91,5,5.413925439,64.96710526,2,penfirst,blue-right,there was a pattern. RLRL,0,1,0.8125
+94,4,4.316885965,51.80263158,2,stickerfirst,pink-right,"don't remember, can't remember",0,0.5,0.6875
+97,5,5.938596491,71.26315789,1,penfirst,blue-right,I've got good memory. I listened to my mind and not the pen,0,1,1
+100,5,5.033991228,60.40789474,2,penfirst,pink-right,I heard it. I picked the right one,0,0.875,0.9375
+106,5,5.091557018,61.09868421,1,stickerfirst,pink-right,because you put them one at a time,0,1,1

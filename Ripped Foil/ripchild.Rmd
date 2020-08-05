@@ -46,9 +46,13 @@ ripchild$age <- as.factor(ripchild$age)# makes continuous variables categorical
 ripchild$id<-as.factor(ripchild$id)
 ripchild$sex<-as.factor(ripchild$sex)
 str(ripchild)
+summary(ripchild)
+sd(ripchild$agemonths)
+sd(ripchild$trialno)
 ```
 
 ```{r}
+###Getting the age, sex distribution table
 ripchild_penfirst <- ripchild %>%
   filter(order=="penfirst") %>%
   group_by(id, sex, agemonths) %>% 
@@ -170,6 +174,27 @@ xx.fe.re=fe.re.tab(fe.model="correct  ~
 xx.fe.re$summary
 ydata=xx.fe.re$data
 ```
+
+
+##Test against chance
+####Test and transfer phase
+
+```{r, echo=TRUE}
+
+##AS wants chance level performance to be reported first thing in the results section
+testphase <-ripchild%>%
+  filter(order3 == "test")
+testchance <- glmer(correct ~ 1 + (z.trialno | id),data= testphase, family=binomial)
+summary(testchance)
+
+transferphase <-ripchild%>%
+  filter(order3 == "transfer")
+transferchance <- glmer(correct ~ 1 + (z.trialno | id),data= transferphase, family=binomial)
+summary(transferchance)
+```
+
+**The intercept is significant: Performance in Test phase is above chance level.**
+
 
 
 ##Full model
@@ -506,10 +531,14 @@ str(ripchild_1st_trial)
 ##binomial test for the first trial performance in Transfer (CV asked for this and Amanda wants to stress the overall performance in Transfer trial 1)
 binom.test(x=sum(ripchild_1st_trial$correct), n=length(ripchild_1st_trial$correct), p=0.5, alternative = "two.sided")
 
-firsttrial <- glm(correct~z.age+sex+trialtype,data=ripchild_1st_trial,family=binomial(link = "logit"))
-summary(firsttrial)
-anova(firsttrial, test="Chisq")
-
+firsttrial <- glm(correct~z.age,data=ripchild_1st_trial,family=binomial(link = "logit"))
+nullfirsttrial<-glm(correct~1, data=ripchild_1st_trial, family=binomial(link="logit"))
+anova(nullfirsttrial, firsttrial, test="Chisq")
+summary(firsttrial)$coefficients
+confint(object=firsttrial)
+cbind(coefficients(firsttrial), confint(object=firsttrial))
+xdrop1=drop1(firsttrial, test="Chisq",control=contr)
+round(xdrop1,3)
 ```
 
 **Age emerges as a significant predictor of first trial performance of Transfer.**
@@ -518,7 +547,8 @@ We can plot this as:
 ```{r echo=FALSE}
 #how about ggplot
 ggplot(ripchild_1st_trial, aes(x=agemonths, y=correct)) + geom_point() + 
-  stat_smooth(method="glm", fullrange = TRUE, lty=2, size=0.5, colour="Black", alpha=0.2,  method.args=list(family="binomial"))+ylab("First trial performance of Transfer Phase")+xlab("Age in months")+xlim(36,72)+theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+  stat_smooth(method="glm", fullrange = TRUE, lty=2, size=0.5, colour="Black", alpha=0.2,  method.args=list(family="binomial")) + scale_x_continuous(breaks = seq(from = 36, to = 72, by = 2)) +  geom_segment(aes(x = 50, y = 0, xend = 50, yend = 0.5), arrow=arrow(length = unit(0.2, "cm")), colour="red")+ylab("First trial performance of Transfer Phase")+xlab("Age in months")+theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + geom_hline(yintercept=0.50, color='red', linetype="dashed")
+
 ```
 
 **Younger children tend to make more errors than older children**
@@ -543,11 +573,29 @@ cbind(coefficients(oequestion), confint(object=oequestion))
 
 ```{r}
 ggplot(openended, aes(x=agemonths, y=explanation)) + geom_point() + 
-  stat_smooth(method="glm", fullrange = TRUE, lty=2, size=0.5, colour="Black", alpha=0.2,  method.args=list(family="binomial"))+ylab("Incorrect (0)/correct (1) explanations")+xlab("Age in months")+xlim(36,72)+theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+  stat_smooth(method="glm", fullrange = TRUE, lty=2, size=0.5, colour="Black", alpha=0.2,  method.args=list(family="binomial"))+ scale_x_continuous(breaks = seq(from = 36, to = 72, by = 4))+ylab("Incorrect (0)/correct (1) explanations")+xlab("Age in months")+theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) 
+
+
 ```
 
 
+```{r}
+#Comparing the performance of those who gave correct explanations to an age matched group
+agematched<-read.csv("agematched_explanation.csv", header=T)
+openended$z.age=as.vector(scale(openended$agemonths))
+str(openended)
+table(openended$explanation)
+oequestion <- glm(explanation~z.age, data=openended, family=binomial(link = "logit"))
+summary(oequestion)
+anova(oequestion, test="Chisq")
 
+#analysis of the open ended questions again after CV comments
+oequestion <- glm(explanation~z.age, data=openended, family=binomial(link = "logit"))
+nullopen <- glm(explanation ~ 1, data=openended, family=binomial(link="logit"))
+anova(nullopen, oequestion, test="Chisq")
+summary(oequestion)$coefficients
+confint(object=oequestion)
+cbind(coefficients(oequestion), confint(object=oequestion))
 
 
 
