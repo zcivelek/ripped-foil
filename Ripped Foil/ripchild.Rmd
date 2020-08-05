@@ -582,22 +582,12 @@ ggplot(openended, aes(x=agemonths, y=explanation)) + geom_point() +
 ```{r}
 #Comparing the performance of those who gave correct explanations to an age matched group
 agematched<-read.csv("agematched_explanation.csv", header=T)
-openended$z.age=as.vector(scale(openended$agemonths))
-str(openended)
-table(openended$explanation)
-oequestion <- glm(explanation~z.age, data=openended, family=binomial(link = "logit"))
-summary(oequestion)
-anova(oequestion, test="Chisq")
-
-#analysis of the open ended questions again after CV comments
-oequestion <- glm(explanation~z.age, data=openended, family=binomial(link = "logit"))
-nullopen <- glm(explanation ~ 1, data=openended, family=binomial(link="logit"))
-anova(nullopen, oequestion, test="Chisq")
-summary(oequestion)$coefficients
-confint(object=oequestion)
-cbind(coefficients(oequestion), confint(object=oequestion))
+str(agematched)
+table(agematched$explanation)
 
 
+
+```
 
 
 

@@ -1,33 +1,513 @@
-id,age,ageyears,agemonths,sex,order,boxtype,answer,explanation,transfer,overall
-15,4,4.583333333,55,1,penfirst,blue-right,there was a hole in there,1,0.875,0.875
-21,5,5.144736842,61.73684211,1,stickerfirst,blue-right,they made holes,1,1,1
-33,4,4.617324561,55.40789474,1,stickerfirst,pink-right,it got popped,1,0.875,0.9375
-34,4,4.405701754,52.86842105,2,stickerfirst,pink-right,it got broken,1,1,1
-41,5,5.191337719,62.29605263,2,stickerfirst,blue-right,followed the pen and the sticker. It got ripped,1,1,1
-45,4,4.128289474,49.53947368,2,penfirst,pink-right,I saw the holes,1,0.875,0.9375
-55,4,4.782894737,57.39473684,2,penfirst,blue-right,I watched you pop it,1,1,1
-57,5,5.288377193,63.46052632,1,stickerfirst,pink-right,I saw you pop,1,0.875,0.875
-58,4,4.030153509,48.36184211,1,stickerfirst,blue-right,I saw you poke,1,0.875,0.875
-64,5,5.083333333,61,2,stickerfirst,blue-right,you made a hole with the pen,1,0.75,0.8125
-66,5,5.535635965,66.42763158,2,stickerfirst,pink-right,you made a hole with the pen but I can't remember,1,0.5,0.375
-72,4,4.669407895,56.03289474,2,stickerfirst,pink-right,you smashed it when you put it in,1,0.875,0.9375
-85,5,5.639254386,67.67105263,1,penfirst,pink-right,made popping gesture with foil,1,0.75,0.75
-87,4,4.402960526,52.83552632,2,stickerfirst,blue-right,I saw you crack it,1,1,1
-88,5,5.262061404,63.14473684,1,stickerfirst,pink-right,I remembered where it went,1,0.875,0.9375
-92,5,5.04495614,60.53947368,1,stickerfirst,pink-right,because you did pen first,1,0.875,0.9375
-16,4,4.641995614,55.70394737,2,stickerfirst,blue-right,"in there, blue and pink",0,0.625,0.75
-17,5,5.278508772,63.34210526,2,penfirst,blue-right,"I saw the stickers go into the cups - I don't know to ""but how did you know which cup it went in?""",0,1,1
-22,5,5.53125,66.375,2,stickerfirst,blue-right,I saw your hand going into the cups,0,1,1
-32,5,5.222587719,62.67105263,2,penfirst,pink-right,I don't know,0,0.5,0.6875
-49,4,4.055921053,48.67105263,1,penfirst,pink-right,I heard it,0,1,0.75
-59,4,4.791118421,57.49342105,2,penfirst,blue-right,"I'm an expert, easy peasy",0,0.5,0.5
-65,5,,67.2,2,penfirst,blue-right,my brain worked. I don't know,0,1,1
-73,4,4.605263158,55.26315789,1,stickerfirst,pink-right,it was tricky,0,0.5,0.6875
-78,4,4.132675439,49.59210526,1,stickerfirst,blue-right,because you put it in the same cup,0,0.375,0.375
-83,4,4.580592105,54.96710526,2,penfirst,blue-right,"doesn't speak much english, couldn't explain",0,0.75,0.8125
-89,4,4.491776316,53.90131579,2,penfirst,blue-right,blue one. Couldn't explain,0,0.5,0.3125
-91,5,5.413925439,64.96710526,2,penfirst,blue-right,there was a pattern. RLRL,0,1,0.8125
-94,4,4.316885965,51.80263158,2,stickerfirst,pink-right,"don't remember, can't remember",0,0.5,0.6875
-97,5,5.938596491,71.26315789,1,penfirst,blue-right,I've got good memory. I listened to my mind and not the pen,0,1,1
-100,5,5.033991228,60.40789474,2,penfirst,pink-right,I heard it. I picked the right one,0,0.875,0.9375
-106,5,5.091557018,61.09868421,1,stickerfirst,pink-right,because you put them one at a time,0,1,1
+id,age,agemonths,ageyears,agecat,sex,order,boxtype,trialtype,order2,order3,trialno,side,response,correct,answer,explanation
+15,4,55,4.583333333,four,1,penfirst,blue-right,pen,1,test,1,R,L,1,there was a hole in there,1
+15,4,55,4.583333333,four,1,penfirst,blue-right,pen,1,test,2,L,R,1,there was a hole in there,1
+15,4,55,4.583333333,four,1,penfirst,blue-right,pen,1,test,3,L,R,1,there was a hole in there,1
+15,4,55,4.583333333,four,1,penfirst,blue-right,pen,1,test,4,R,L,1,there was a hole in there,1
+15,4,55,4.583333333,four,1,penfirst,blue-right,pen,1,test,5,L,R,1,there was a hole in there,1
+15,4,55,4.583333333,four,1,penfirst,blue-right,pen,1,test,6,R,R,0,there was a hole in there,1
+15,4,55,4.583333333,four,1,penfirst,blue-right,pen,1,test,7,R,L,1,there was a hole in there,1
+15,4,55,4.583333333,four,1,penfirst,blue-right,pen,1,test,8,L,R,1,there was a hole in there,1
+15,4,55,4.583333333,four,1,penfirst,blue-right,sticker,2,transfer,1,L,L,1,there was a hole in there,1
+15,4,55,4.583333333,four,1,penfirst,blue-right,sticker,2,transfer,2,R,R,1,there was a hole in there,1
+15,4,55,4.583333333,four,1,penfirst,blue-right,sticker,2,transfer,3,R,L,0,there was a hole in there,1
+15,4,55,4.583333333,four,1,penfirst,blue-right,sticker,2,transfer,4,L,L,1,there was a hole in there,1
+15,4,55,4.583333333,four,1,penfirst,blue-right,sticker,2,transfer,5,L,L,1,there was a hole in there,1
+15,4,55,4.583333333,four,1,penfirst,blue-right,sticker,2,transfer,6,R,R,1,there was a hole in there,1
+15,4,55,4.583333333,four,1,penfirst,blue-right,sticker,2,transfer,7,L,L,1,there was a hole in there,1
+15,4,55,4.583333333,four,1,penfirst,blue-right,sticker,2,transfer,8,L,L,1,there was a hole in there,1
+16,4,55.70394737,4.641995614,four,2,stickerfirst,blue-right,pen,2,transfer,1,L,R,1,"in there, blue and pink",0
+16,4,55.70394737,4.641995614,four,2,stickerfirst,blue-right,pen,2,transfer,2,R,L,1,"in there, blue and pink",0
+16,4,55.70394737,4.641995614,four,2,stickerfirst,blue-right,pen,2,transfer,3,R,L,1,"in there, blue and pink",0
+16,4,55.70394737,4.641995614,four,2,stickerfirst,blue-right,pen,2,transfer,4,L,R,1,"in there, blue and pink",0
+16,4,55.70394737,4.641995614,four,2,stickerfirst,blue-right,pen,2,transfer,5,L,R,1,"in there, blue and pink",0
+16,4,55.70394737,4.641995614,four,2,stickerfirst,blue-right,pen,2,transfer,6,R,R,0,"in there, blue and pink",0
+16,4,55.70394737,4.641995614,four,2,stickerfirst,blue-right,pen,2,transfer,7,L,L,0,"in there, blue and pink",0
+16,4,55.70394737,4.641995614,four,2,stickerfirst,blue-right,pen,2,transfer,8,L,L,0,"in there, blue and pink",0
+16,4,55.70394737,4.641995614,four,2,stickerfirst,blue-right,sticker,1,test,1,R,R,1,"in there, blue and pink",0
+16,4,55.70394737,4.641995614,four,2,stickerfirst,blue-right,sticker,1,test,2,L,L,1,"in there, blue and pink",0
+16,4,55.70394737,4.641995614,four,2,stickerfirst,blue-right,sticker,1,test,3,L,R,0,"in there, blue and pink",0
+16,4,55.70394737,4.641995614,four,2,stickerfirst,blue-right,sticker,1,test,4,R,R,1,"in there, blue and pink",0
+16,4,55.70394737,4.641995614,four,2,stickerfirst,blue-right,sticker,1,test,5,L,L,1,"in there, blue and pink",0
+16,4,55.70394737,4.641995614,four,2,stickerfirst,blue-right,sticker,1,test,6,R,R,1,"in there, blue and pink",0
+16,4,55.70394737,4.641995614,four,2,stickerfirst,blue-right,sticker,1,test,7,R,R,1,"in there, blue and pink",0
+16,4,55.70394737,4.641995614,four,2,stickerfirst,blue-right,sticker,1,test,8,L,L,1,"in there, blue and pink",0
+17,5,63.34210526,5.278508772,five,2,penfirst,blue-right,pen,1,test,1,L,R,1,"I saw the stickers go into the cups - I don't know to ""but how did you know which cup it went in?""",0
+17,5,63.34210526,5.278508772,five,2,penfirst,blue-right,pen,1,test,2,L,R,1,"I saw the stickers go into the cups - I don't know to ""but how did you know which cup it went in?""",0
+17,5,63.34210526,5.278508772,five,2,penfirst,blue-right,pen,1,test,3,R,L,1,"I saw the stickers go into the cups - I don't know to ""but how did you know which cup it went in?""",0
+17,5,63.34210526,5.278508772,five,2,penfirst,blue-right,pen,1,test,4,L,R,1,"I saw the stickers go into the cups - I don't know to ""but how did you know which cup it went in?""",0
+17,5,63.34210526,5.278508772,five,2,penfirst,blue-right,pen,1,test,5,R,L,1,"I saw the stickers go into the cups - I don't know to ""but how did you know which cup it went in?""",0
+17,5,63.34210526,5.278508772,five,2,penfirst,blue-right,pen,1,test,6,L,R,1,"I saw the stickers go into the cups - I don't know to ""but how did you know which cup it went in?""",0
+17,5,63.34210526,5.278508772,five,2,penfirst,blue-right,pen,1,test,7,R,L,1,"I saw the stickers go into the cups - I don't know to ""but how did you know which cup it went in?""",0
+17,5,63.34210526,5.278508772,five,2,penfirst,blue-right,pen,1,test,8,R,L,1,"I saw the stickers go into the cups - I don't know to ""but how did you know which cup it went in?""",0
+17,5,63.34210526,5.278508772,five,2,penfirst,blue-right,sticker,2,transfer,1,R,R,1,"I saw the stickers go into the cups - I don't know to ""but how did you know which cup it went in?""",0
+17,5,63.34210526,5.278508772,five,2,penfirst,blue-right,sticker,2,transfer,2,R,R,1,"I saw the stickers go into the cups - I don't know to ""but how did you know which cup it went in?""",0
+17,5,63.34210526,5.278508772,five,2,penfirst,blue-right,sticker,2,transfer,3,L,L,1,"I saw the stickers go into the cups - I don't know to ""but how did you know which cup it went in?""",0
+17,5,63.34210526,5.278508772,five,2,penfirst,blue-right,sticker,2,transfer,4,L,L,1,"I saw the stickers go into the cups - I don't know to ""but how did you know which cup it went in?""",0
+17,5,63.34210526,5.278508772,five,2,penfirst,blue-right,sticker,2,transfer,5,R,R,1,"I saw the stickers go into the cups - I don't know to ""but how did you know which cup it went in?""",0
+17,5,63.34210526,5.278508772,five,2,penfirst,blue-right,sticker,2,transfer,6,R,R,1,"I saw the stickers go into the cups - I don't know to ""but how did you know which cup it went in?""",0
+17,5,63.34210526,5.278508772,five,2,penfirst,blue-right,sticker,2,transfer,7,L,L,1,"I saw the stickers go into the cups - I don't know to ""but how did you know which cup it went in?""",0
+17,5,63.34210526,5.278508772,five,2,penfirst,blue-right,sticker,2,transfer,8,R,R,1,"I saw the stickers go into the cups - I don't know to ""but how did you know which cup it went in?""",0
+21,5,61.73684211,5.144736842,five,1,stickerfirst,blue-right,pen,2,transfer,1,R,L,1,they made holes,1
+21,5,61.73684211,5.144736842,five,1,stickerfirst,blue-right,pen,2,transfer,2,L,R,1,they made holes,1
+21,5,61.73684211,5.144736842,five,1,stickerfirst,blue-right,pen,2,transfer,3,L,R,1,they made holes,1
+21,5,61.73684211,5.144736842,five,1,stickerfirst,blue-right,pen,2,transfer,4,R,L,1,they made holes,1
+21,5,61.73684211,5.144736842,five,1,stickerfirst,blue-right,pen,2,transfer,5,R,L,1,they made holes,1
+21,5,61.73684211,5.144736842,five,1,stickerfirst,blue-right,pen,2,transfer,6,L,R,1,they made holes,1
+21,5,61.73684211,5.144736842,five,1,stickerfirst,blue-right,pen,2,transfer,7,R,L,1,they made holes,1
+21,5,61.73684211,5.144736842,five,1,stickerfirst,blue-right,pen,2,transfer,8,L,R,1,they made holes,1
+21,5,61.73684211,5.144736842,five,1,stickerfirst,blue-right,sticker,1,test,1,L,L,1,they made holes,1
+21,5,61.73684211,5.144736842,five,1,stickerfirst,blue-right,sticker,1,test,2,R,R,1,they made holes,1
+21,5,61.73684211,5.144736842,five,1,stickerfirst,blue-right,sticker,1,test,3,R,R,1,they made holes,1
+21,5,61.73684211,5.144736842,five,1,stickerfirst,blue-right,sticker,1,test,4,L,L,1,they made holes,1
+21,5,61.73684211,5.144736842,five,1,stickerfirst,blue-right,sticker,1,test,5,R,R,1,they made holes,1
+21,5,61.73684211,5.144736842,five,1,stickerfirst,blue-right,sticker,1,test,6,L,L,1,they made holes,1
+21,5,61.73684211,5.144736842,five,1,stickerfirst,blue-right,sticker,1,test,7,L,L,1,they made holes,1
+21,5,61.73684211,5.144736842,five,1,stickerfirst,blue-right,sticker,1,test,8,R,R,1,they made holes,1
+22,5,66.375,5.53125,five,2,stickerfirst,blue-right,pen,2,transfer,1,R,L,1,I saw your hand going into the cups,0
+22,5,66.375,5.53125,five,2,stickerfirst,blue-right,pen,2,transfer,2,L,R,1,I saw your hand going into the cups,0
+22,5,66.375,5.53125,five,2,stickerfirst,blue-right,pen,2,transfer,3,R,L,1,I saw your hand going into the cups,0
+22,5,66.375,5.53125,five,2,stickerfirst,blue-right,pen,2,transfer,4,L,R,1,I saw your hand going into the cups,0
+22,5,66.375,5.53125,five,2,stickerfirst,blue-right,pen,2,transfer,5,R,L,1,I saw your hand going into the cups,0
+22,5,66.375,5.53125,five,2,stickerfirst,blue-right,pen,2,transfer,6,L,R,1,I saw your hand going into the cups,0
+22,5,66.375,5.53125,five,2,stickerfirst,blue-right,pen,2,transfer,7,L,R,1,I saw your hand going into the cups,0
+22,5,66.375,5.53125,five,2,stickerfirst,blue-right,pen,2,transfer,8,R,L,1,I saw your hand going into the cups,0
+22,5,66.375,5.53125,five,2,stickerfirst,blue-right,sticker,1,test,1,L,L,1,I saw your hand going into the cups,0
+22,5,66.375,5.53125,five,2,stickerfirst,blue-right,sticker,1,test,2,L,L,1,I saw your hand going into the cups,0
+22,5,66.375,5.53125,five,2,stickerfirst,blue-right,sticker,1,test,3,R,R,1,I saw your hand going into the cups,0
+22,5,66.375,5.53125,five,2,stickerfirst,blue-right,sticker,1,test,4,L,L,1,I saw your hand going into the cups,0
+22,5,66.375,5.53125,five,2,stickerfirst,blue-right,sticker,1,test,5,R,R,1,I saw your hand going into the cups,0
+22,5,66.375,5.53125,five,2,stickerfirst,blue-right,sticker,1,test,6,R,R,1,I saw your hand going into the cups,0
+22,5,66.375,5.53125,five,2,stickerfirst,blue-right,sticker,1,test,7,L,L,1,I saw your hand going into the cups,0
+22,5,66.375,5.53125,five,2,stickerfirst,blue-right,sticker,1,test,8,R,R,1,I saw your hand going into the cups,0
+32,5,62.67105263,5.222587719,five,2,penfirst,pink-right,pen,1,test,1,L,R,1,I don't know,0
+32,5,62.67105263,5.222587719,five,2,penfirst,pink-right,pen,1,test,2,R,L,1,I don't know,0
+32,5,62.67105263,5.222587719,five,2,penfirst,pink-right,pen,1,test,3,R,L,1,I don't know,0
+32,5,62.67105263,5.222587719,five,2,penfirst,pink-right,pen,1,test,4,L,L,0,I don't know,0
+32,5,62.67105263,5.222587719,five,2,penfirst,pink-right,pen,1,test,5,R,L,1,I don't know,0
+32,5,62.67105263,5.222587719,five,2,penfirst,pink-right,pen,1,test,6,L,R,1,I don't know,0
+32,5,62.67105263,5.222587719,five,2,penfirst,pink-right,pen,1,test,7,L,R,1,I don't know,0
+32,5,62.67105263,5.222587719,five,2,penfirst,pink-right,pen,1,test,8,R,L,1,I don't know,0
+32,5,62.67105263,5.222587719,five,2,penfirst,pink-right,sticker,2,transfer,1,R,R,1,I don't know,0
+32,5,62.67105263,5.222587719,five,2,penfirst,pink-right,sticker,2,transfer,2,L,R,0,I don't know,0
+32,5,62.67105263,5.222587719,five,2,penfirst,pink-right,sticker,2,transfer,3,L,L,1,I don't know,0
+32,5,62.67105263,5.222587719,five,2,penfirst,pink-right,sticker,2,transfer,4,R,L,0,I don't know,0
+32,5,62.67105263,5.222587719,five,2,penfirst,pink-right,sticker,2,transfer,5,R,R,1,I don't know,0
+32,5,62.67105263,5.222587719,five,2,penfirst,pink-right,sticker,2,transfer,6,L,L,1,I don't know,0
+32,5,62.67105263,5.222587719,five,2,penfirst,pink-right,sticker,2,transfer,7,R,L,0,I don't know,0
+32,5,62.67105263,5.222587719,five,2,penfirst,pink-right,sticker,2,transfer,8,L,R,0,I don't know,0
+33,4,55.40789474,4.617324561,four,1,stickerfirst,pink-right,pen,2,transfer,1,R,L,1,it got popped,1
+33,4,55.40789474,4.617324561,four,1,stickerfirst,pink-right,pen,2,transfer,2,L,R,1,it got popped,1
+33,4,55.40789474,4.617324561,four,1,stickerfirst,pink-right,pen,2,transfer,3,L,R,1,it got popped,1
+33,4,55.40789474,4.617324561,four,1,stickerfirst,pink-right,pen,2,transfer,4,R,L,1,it got popped,1
+33,4,55.40789474,4.617324561,four,1,stickerfirst,pink-right,pen,2,transfer,5,R,R,0,it got popped,1
+33,4,55.40789474,4.617324561,four,1,stickerfirst,pink-right,pen,2,transfer,6,L,R,1,it got popped,1
+33,4,55.40789474,4.617324561,four,1,stickerfirst,pink-right,pen,2,transfer,7,R,L,1,it got popped,1
+33,4,55.40789474,4.617324561,four,1,stickerfirst,pink-right,pen,2,transfer,8,L,R,1,it got popped,1
+33,4,55.40789474,4.617324561,four,1,stickerfirst,pink-right,sticker,1,test,1,L,L,1,it got popped,1
+33,4,55.40789474,4.617324561,four,1,stickerfirst,pink-right,sticker,1,test,2,R,R,1,it got popped,1
+33,4,55.40789474,4.617324561,four,1,stickerfirst,pink-right,sticker,1,test,3,R,R,1,it got popped,1
+33,4,55.40789474,4.617324561,four,1,stickerfirst,pink-right,sticker,1,test,4,L,L,1,it got popped,1
+33,4,55.40789474,4.617324561,four,1,stickerfirst,pink-right,sticker,1,test,5,R,R,1,it got popped,1
+33,4,55.40789474,4.617324561,four,1,stickerfirst,pink-right,sticker,1,test,6,L,L,1,it got popped,1
+33,4,55.40789474,4.617324561,four,1,stickerfirst,pink-right,sticker,1,test,7,L,L,1,it got popped,1
+33,4,55.40789474,4.617324561,four,1,stickerfirst,pink-right,sticker,1,test,8,R,R,1,it got popped,1
+34,4,52.86842105,4.405701754,four,2,stickerfirst,pink-right,pen,2,transfer,1,R,L,1,it got broken,1
+34,4,52.86842105,4.405701754,four,2,stickerfirst,pink-right,pen,2,transfer,2,L,R,1,it got broken,1
+34,4,52.86842105,4.405701754,four,2,stickerfirst,pink-right,pen,2,transfer,3,R,L,1,it got broken,1
+34,4,52.86842105,4.405701754,four,2,stickerfirst,pink-right,pen,2,transfer,4,L,R,1,it got broken,1
+34,4,52.86842105,4.405701754,four,2,stickerfirst,pink-right,pen,2,transfer,5,R,L,1,it got broken,1
+34,4,52.86842105,4.405701754,four,2,stickerfirst,pink-right,pen,2,transfer,6,L,R,1,it got broken,1
+34,4,52.86842105,4.405701754,four,2,stickerfirst,pink-right,pen,2,transfer,7,L,R,1,it got broken,1
+34,4,52.86842105,4.405701754,four,2,stickerfirst,pink-right,pen,2,transfer,8,R,L,1,it got broken,1
+34,4,52.86842105,4.405701754,four,2,stickerfirst,pink-right,sticker,1,test,1,L,L,1,it got broken,1
+34,4,52.86842105,4.405701754,four,2,stickerfirst,pink-right,sticker,1,test,2,L,L,1,it got broken,1
+34,4,52.86842105,4.405701754,four,2,stickerfirst,pink-right,sticker,1,test,3,R,R,1,it got broken,1
+34,4,52.86842105,4.405701754,four,2,stickerfirst,pink-right,sticker,1,test,4,L,L,1,it got broken,1
+34,4,52.86842105,4.405701754,four,2,stickerfirst,pink-right,sticker,1,test,5,R,R,1,it got broken,1
+34,4,52.86842105,4.405701754,four,2,stickerfirst,pink-right,sticker,1,test,6,R,R,1,it got broken,1
+34,4,52.86842105,4.405701754,four,2,stickerfirst,pink-right,sticker,1,test,7,L,L,1,it got broken,1
+34,4,52.86842105,4.405701754,four,2,stickerfirst,pink-right,sticker,1,test,8,R,R,1,it got broken,1
+41,5,62.29605263,5.191337719,five,2,stickerfirst,blue-right,pen,2,transfer,1,R,L,1,followed the pen and the sticker. It got ripped,1
+41,5,62.29605263,5.191337719,five,2,stickerfirst,blue-right,pen,2,transfer,2,L,R,1,followed the pen and the sticker. It got ripped,1
+41,5,62.29605263,5.191337719,five,2,stickerfirst,blue-right,pen,2,transfer,3,L,R,1,followed the pen and the sticker. It got ripped,1
+41,5,62.29605263,5.191337719,five,2,stickerfirst,blue-right,pen,2,transfer,4,R,L,1,followed the pen and the sticker. It got ripped,1
+41,5,62.29605263,5.191337719,five,2,stickerfirst,blue-right,pen,2,transfer,5,R,L,1,followed the pen and the sticker. It got ripped,1
+41,5,62.29605263,5.191337719,five,2,stickerfirst,blue-right,pen,2,transfer,6,L,R,1,followed the pen and the sticker. It got ripped,1
+41,5,62.29605263,5.191337719,five,2,stickerfirst,blue-right,pen,2,transfer,7,R,L,1,followed the pen and the sticker. It got ripped,1
+41,5,62.29605263,5.191337719,five,2,stickerfirst,blue-right,pen,2,transfer,8,L,R,1,followed the pen and the sticker. It got ripped,1
+41,5,62.29605263,5.191337719,five,2,stickerfirst,blue-right,sticker,1,test,1,L,L,1,followed the pen and the sticker. It got ripped,1
+41,5,62.29605263,5.191337719,five,2,stickerfirst,blue-right,sticker,1,test,2,R,R,1,followed the pen and the sticker. It got ripped,1
+41,5,62.29605263,5.191337719,five,2,stickerfirst,blue-right,sticker,1,test,3,R,R,1,followed the pen and the sticker. It got ripped,1
+41,5,62.29605263,5.191337719,five,2,stickerfirst,blue-right,sticker,1,test,4,L,L,1,followed the pen and the sticker. It got ripped,1
+41,5,62.29605263,5.191337719,five,2,stickerfirst,blue-right,sticker,1,test,5,R,R,1,followed the pen and the sticker. It got ripped,1
+41,5,62.29605263,5.191337719,five,2,stickerfirst,blue-right,sticker,1,test,6,L,L,1,followed the pen and the sticker. It got ripped,1
+41,5,62.29605263,5.191337719,five,2,stickerfirst,blue-right,sticker,1,test,7,L,L,1,followed the pen and the sticker. It got ripped,1
+41,5,62.29605263,5.191337719,five,2,stickerfirst,blue-right,sticker,1,test,8,R,R,1,followed the pen and the sticker. It got ripped,1
+45,4,49.53947368,4.128289474,four,2,penfirst,pink-right,pen,1,test,1,L,R,1,I saw the holes,1
+45,4,49.53947368,4.128289474,four,2,penfirst,pink-right,pen,1,test,2,L,R,1,I saw the holes,1
+45,4,49.53947368,4.128289474,four,2,penfirst,pink-right,pen,1,test,3,R,L,1,I saw the holes,1
+45,4,49.53947368,4.128289474,four,2,penfirst,pink-right,pen,1,test,4,L,R,1,I saw the holes,1
+45,4,49.53947368,4.128289474,four,2,penfirst,pink-right,pen,1,test,5,R,L,1,I saw the holes,1
+45,4,49.53947368,4.128289474,four,2,penfirst,pink-right,pen,1,test,6,R,L,1,I saw the holes,1
+45,4,49.53947368,4.128289474,four,2,penfirst,pink-right,pen,1,test,7,L,R,1,I saw the holes,1
+45,4,49.53947368,4.128289474,four,2,penfirst,pink-right,pen,1,test,8,R,L,1,I saw the holes,1
+45,4,49.53947368,4.128289474,four,2,penfirst,pink-right,sticker,2,transfer,1,R,R,1,I saw the holes,1
+45,4,49.53947368,4.128289474,four,2,penfirst,pink-right,sticker,2,transfer,2,L,R,0,I saw the holes,1
+45,4,49.53947368,4.128289474,four,2,penfirst,pink-right,sticker,2,transfer,3,R,R,1,I saw the holes,1
+45,4,49.53947368,4.128289474,four,2,penfirst,pink-right,sticker,2,transfer,4,L,L,1,I saw the holes,1
+45,4,49.53947368,4.128289474,four,2,penfirst,pink-right,sticker,2,transfer,5,R,R,1,I saw the holes,1
+45,4,49.53947368,4.128289474,four,2,penfirst,pink-right,sticker,2,transfer,6,L,L,1,I saw the holes,1
+45,4,49.53947368,4.128289474,four,2,penfirst,pink-right,sticker,2,transfer,7,L,L,1,I saw the holes,1
+45,4,49.53947368,4.128289474,four,2,penfirst,pink-right,sticker,2,transfer,8,R,R,1,I saw the holes,1
+49,4,48.67105263,4.055921053,four,1,penfirst,pink-right,pen,1,test,1,L,L,0,I heard it,0
+49,4,48.67105263,4.055921053,four,1,penfirst,pink-right,pen,1,test,2,R,R,0,I heard it,0
+49,4,48.67105263,4.055921053,four,1,penfirst,pink-right,pen,1,test,3,R,L,1,I heard it,0
+49,4,48.67105263,4.055921053,four,1,penfirst,pink-right,pen,1,test,4,L,R,1,I heard it,0
+49,4,48.67105263,4.055921053,four,1,penfirst,pink-right,pen,1,test,5,R,L,1,I heard it,0
+49,4,48.67105263,4.055921053,four,1,penfirst,pink-right,pen,1,test,6,L,R,1,I heard it,0
+49,4,48.67105263,4.055921053,four,1,penfirst,pink-right,pen,1,test,7,L,L,0,I heard it,0
+49,4,48.67105263,4.055921053,four,1,penfirst,pink-right,pen,1,test,8,R,R,0,I heard it,0
+49,4,48.67105263,4.055921053,four,1,penfirst,pink-right,sticker,2,transfer,1,R,R,1,I heard it,0
+49,4,48.67105263,4.055921053,four,1,penfirst,pink-right,sticker,2,transfer,2,L,L,1,I heard it,0
+49,4,48.67105263,4.055921053,four,1,penfirst,pink-right,sticker,2,transfer,3,L,L,1,I heard it,0
+49,4,48.67105263,4.055921053,four,1,penfirst,pink-right,sticker,2,transfer,4,R,R,1,I heard it,0
+49,4,48.67105263,4.055921053,four,1,penfirst,pink-right,sticker,2,transfer,5,R,R,1,I heard it,0
+49,4,48.67105263,4.055921053,four,1,penfirst,pink-right,sticker,2,transfer,6,L,L,1,I heard it,0
+49,4,48.67105263,4.055921053,four,1,penfirst,pink-right,sticker,2,transfer,7,R,R,1,I heard it,0
+49,4,48.67105263,4.055921053,four,1,penfirst,pink-right,sticker,2,transfer,8,L,L,1,I heard it,0
+55,4,57.39473684,4.782894737,four,2,penfirst,blue-right,pen,1,test,1,L,R,1,I watched you pop it,1
+55,4,57.39473684,4.782894737,four,2,penfirst,blue-right,pen,1,test,2,R,L,1,I watched you pop it,1
+55,4,57.39473684,4.782894737,four,2,penfirst,blue-right,pen,1,test,3,R,L,1,I watched you pop it,1
+55,4,57.39473684,4.782894737,four,2,penfirst,blue-right,pen,1,test,4,L,R,1,I watched you pop it,1
+55,4,57.39473684,4.782894737,four,2,penfirst,blue-right,pen,1,test,5,R,L,1,I watched you pop it,1
+55,4,57.39473684,4.782894737,four,2,penfirst,blue-right,pen,1,test,6,L,R,1,I watched you pop it,1
+55,4,57.39473684,4.782894737,four,2,penfirst,blue-right,pen,1,test,7,L,R,1,I watched you pop it,1
+55,4,57.39473684,4.782894737,four,2,penfirst,blue-right,pen,1,test,8,R,L,1,I watched you pop it,1
+55,4,57.39473684,4.782894737,four,2,penfirst,blue-right,sticker,2,transfer,1,R,R,1,I watched you pop it,1
+55,4,57.39473684,4.782894737,four,2,penfirst,blue-right,sticker,2,transfer,2,L,L,1,I watched you pop it,1
+55,4,57.39473684,4.782894737,four,2,penfirst,blue-right,sticker,2,transfer,3,L,L,1,I watched you pop it,1
+55,4,57.39473684,4.782894737,four,2,penfirst,blue-right,sticker,2,transfer,4,R,R,1,I watched you pop it,1
+55,4,57.39473684,4.782894737,four,2,penfirst,blue-right,sticker,2,transfer,5,R,R,1,I watched you pop it,1
+55,4,57.39473684,4.782894737,four,2,penfirst,blue-right,sticker,2,transfer,6,L,L,1,I watched you pop it,1
+55,4,57.39473684,4.782894737,four,2,penfirst,blue-right,sticker,2,transfer,7,R,R,1,I watched you pop it,1
+55,4,57.39473684,4.782894737,four,2,penfirst,blue-right,sticker,2,transfer,8,L,L,1,I watched you pop it,1
+57,5,63.46052632,5.288377193,five,1,stickerfirst,pink-right,pen,2,transfer,1,R,L,1,I saw you pop,1
+57,5,63.46052632,5.288377193,five,1,stickerfirst,pink-right,pen,2,transfer,2,L,R,1,I saw you pop,1
+57,5,63.46052632,5.288377193,five,1,stickerfirst,pink-right,pen,2,transfer,3,R,L,1,I saw you pop,1
+57,5,63.46052632,5.288377193,five,1,stickerfirst,pink-right,pen,2,transfer,4,L,R,1,I saw you pop,1
+57,5,63.46052632,5.288377193,five,1,stickerfirst,pink-right,pen,2,transfer,5,R,L,1,I saw you pop,1
+57,5,63.46052632,5.288377193,five,1,stickerfirst,pink-right,pen,2,transfer,6,L,R,1,I saw you pop,1
+57,5,63.46052632,5.288377193,five,1,stickerfirst,pink-right,pen,2,transfer,7,L,L,0,I saw you pop,1
+57,5,63.46052632,5.288377193,five,1,stickerfirst,pink-right,pen,2,transfer,8,R,R,1,I saw you pop,1
+57,5,63.46052632,5.288377193,five,1,stickerfirst,pink-right,sticker,1,test,1,L,L,1,I saw you pop,1
+57,5,63.46052632,5.288377193,five,1,stickerfirst,pink-right,sticker,1,test,2,L,L,1,I saw you pop,1
+57,5,63.46052632,5.288377193,five,1,stickerfirst,pink-right,sticker,1,test,3,R,R,1,I saw you pop,1
+57,5,63.46052632,5.288377193,five,1,stickerfirst,pink-right,sticker,1,test,4,L,L,1,I saw you pop,1
+57,5,63.46052632,5.288377193,five,1,stickerfirst,pink-right,sticker,1,test,5,R,R,1,I saw you pop,1
+57,5,63.46052632,5.288377193,five,1,stickerfirst,pink-right,sticker,1,test,6,R,L,0,I saw you pop,1
+57,5,63.46052632,5.288377193,five,1,stickerfirst,pink-right,sticker,1,test,7,L,L,1,I saw you pop,1
+57,5,63.46052632,5.288377193,five,1,stickerfirst,pink-right,sticker,1,test,8,R,R,1,I saw you pop,1
+58,4,48.36184211,4.030153509,four,1,stickerfirst,blue-right,pen,2,transfer,1,R,L,1,I saw you poke,1
+58,4,48.36184211,4.030153509,four,1,stickerfirst,blue-right,pen,2,transfer,2,L,R,1,I saw you poke,1
+58,4,48.36184211,4.030153509,four,1,stickerfirst,blue-right,pen,2,transfer,3,R,L,1,I saw you poke,1
+58,4,48.36184211,4.030153509,four,1,stickerfirst,blue-right,pen,2,transfer,4,L,L,0,I saw you poke,1
+58,4,48.36184211,4.030153509,four,1,stickerfirst,blue-right,pen,2,transfer,5,R,L,1,I saw you poke,1
+58,4,48.36184211,4.030153509,four,1,stickerfirst,blue-right,pen,2,transfer,6,L,R,1,I saw you poke,1
+58,4,48.36184211,4.030153509,four,1,stickerfirst,blue-right,pen,2,transfer,7,L,R,1,I saw you poke,1
+58,4,48.36184211,4.030153509,four,1,stickerfirst,blue-right,pen,2,transfer,8,R,L,1,I saw you poke,1
+58,4,48.36184211,4.030153509,four,1,stickerfirst,blue-right,sticker,1,test,1,L,L,1,I saw you poke,1
+58,4,48.36184211,4.030153509,four,1,stickerfirst,blue-right,sticker,1,test,2,L,R,0,I saw you poke,1
+58,4,48.36184211,4.030153509,four,1,stickerfirst,blue-right,sticker,1,test,3,R,R,1,I saw you poke,1
+58,4,48.36184211,4.030153509,four,1,stickerfirst,blue-right,sticker,1,test,4,L,L,1,I saw you poke,1
+58,4,48.36184211,4.030153509,four,1,stickerfirst,blue-right,sticker,1,test,5,R,R,1,I saw you poke,1
+58,4,48.36184211,4.030153509,four,1,stickerfirst,blue-right,sticker,1,test,6,R,R,1,I saw you poke,1
+58,4,48.36184211,4.030153509,four,1,stickerfirst,blue-right,sticker,1,test,7,L,L,1,I saw you poke,1
+58,4,48.36184211,4.030153509,four,1,stickerfirst,blue-right,sticker,1,test,8,R,R,1,I saw you poke,1
+59,4,57.49342105,4.791118421,four,2,penfirst,blue-right,pen,1,test,1,L,L,0,"I'm an expert, easy peasy",0
+59,4,57.49342105,4.791118421,four,2,penfirst,blue-right,pen,1,test,2,R,L,1,"I'm an expert, easy peasy",0
+59,4,57.49342105,4.791118421,four,2,penfirst,blue-right,pen,1,test,3,R,R,0,"I'm an expert, easy peasy",0
+59,4,57.49342105,4.791118421,four,2,penfirst,blue-right,pen,1,test,4,L,L,0,"I'm an expert, easy peasy",0
+59,4,57.49342105,4.791118421,four,2,penfirst,blue-right,pen,1,test,5,L,R,1,"I'm an expert, easy peasy",0
+59,4,57.49342105,4.791118421,four,2,penfirst,blue-right,pen,1,test,6,L,R,1,"I'm an expert, easy peasy",0
+59,4,57.49342105,4.791118421,four,2,penfirst,blue-right,pen,1,test,7,R,L,1,"I'm an expert, easy peasy",0
+59,4,57.49342105,4.791118421,four,2,penfirst,blue-right,pen,1,test,8,R,R,0,"I'm an expert, easy peasy",0
+59,4,57.49342105,4.791118421,four,2,penfirst,blue-right,sticker,2,transfer,1,R,R,1,"I'm an expert, easy peasy",0
+59,4,57.49342105,4.791118421,four,2,penfirst,blue-right,sticker,2,transfer,2,L,L,1,"I'm an expert, easy peasy",0
+59,4,57.49342105,4.791118421,four,2,penfirst,blue-right,sticker,2,transfer,3,L,R,0,"I'm an expert, easy peasy",0
+59,4,57.49342105,4.791118421,four,2,penfirst,blue-right,sticker,2,transfer,4,R,R,1,"I'm an expert, easy peasy",0
+59,4,57.49342105,4.791118421,four,2,penfirst,blue-right,sticker,2,transfer,5,R,L,0,"I'm an expert, easy peasy",0
+59,4,57.49342105,4.791118421,four,2,penfirst,blue-right,sticker,2,transfer,6,L,R,0,"I'm an expert, easy peasy",0
+59,4,57.49342105,4.791118421,four,2,penfirst,blue-right,sticker,2,transfer,7,R,L,0,"I'm an expert, easy peasy",0
+59,4,57.49342105,4.791118421,four,2,penfirst,blue-right,sticker,2,transfer,8,L,L,1,"I'm an expert, easy peasy",0
+64,5,61,5.083333333,five,2,stickerfirst,blue-right,pen,2,transfer,1,R,R,0,you made a hole with the pen,1
+64,5,61,5.083333333,five,2,stickerfirst,blue-right,pen,2,transfer,2,L,L,0,you made a hole with the pen,1
+64,5,61,5.083333333,five,2,stickerfirst,blue-right,pen,2,transfer,3,R,L,1,you made a hole with the pen,1
+64,5,61,5.083333333,five,2,stickerfirst,blue-right,pen,2,transfer,4,L,R,1,you made a hole with the pen,1
+64,5,61,5.083333333,five,2,stickerfirst,blue-right,pen,2,transfer,5,R,L,1,you made a hole with the pen,1
+64,5,61,5.083333333,five,2,stickerfirst,blue-right,pen,2,transfer,6,L,R,1,you made a hole with the pen,1
+64,5,61,5.083333333,five,2,stickerfirst,blue-right,pen,2,transfer,7,L,R,1,you made a hole with the pen,1
+64,5,61,5.083333333,five,2,stickerfirst,blue-right,pen,2,transfer,8,R,L,1,you made a hole with the pen,1
+64,5,61,5.083333333,five,2,stickerfirst,blue-right,sticker,1,test,1,L,R,0,you made a hole with the pen,1
+64,5,61,5.083333333,five,2,stickerfirst,blue-right,sticker,1,test,2,L,L,1,you made a hole with the pen,1
+64,5,61,5.083333333,five,2,stickerfirst,blue-right,sticker,1,test,3,R,R,1,you made a hole with the pen,1
+64,5,61,5.083333333,five,2,stickerfirst,blue-right,sticker,1,test,4,L,L,1,you made a hole with the pen,1
+64,5,61,5.083333333,five,2,stickerfirst,blue-right,sticker,1,test,5,R,R,1,you made a hole with the pen,1
+64,5,61,5.083333333,five,2,stickerfirst,blue-right,sticker,1,test,6,R,R,1,you made a hole with the pen,1
+64,5,61,5.083333333,five,2,stickerfirst,blue-right,sticker,1,test,7,L,L,1,you made a hole with the pen,1
+64,5,61,5.083333333,five,2,stickerfirst,blue-right,sticker,1,test,8,R,R,1,you made a hole with the pen,1
+65,5,67.2,5.6,five,2,penfirst,blue-right,pen,1,test,1,L,R,1,my brain worked. I don't know,0
+65,5,67.2,5.6,five,2,penfirst,blue-right,pen,1,test,2,L,R,1,my brain worked. I don't know,0
+65,5,67.2,5.6,five,2,penfirst,blue-right,pen,1,test,3,R,L,1,my brain worked. I don't know,0
+65,5,67.2,5.6,five,2,penfirst,blue-right,pen,1,test,4,L,R,1,my brain worked. I don't know,0
+65,5,67.2,5.6,five,2,penfirst,blue-right,pen,1,test,5,R,L,1,my brain worked. I don't know,0
+65,5,67.2,5.6,five,2,penfirst,blue-right,pen,1,test,6,R,L,1,my brain worked. I don't know,0
+65,5,67.2,5.6,five,2,penfirst,blue-right,pen,1,test,7,L,R,1,my brain worked. I don't know,0
+65,5,67.2,5.6,five,2,penfirst,blue-right,pen,1,test,8,R,R,1,my brain worked. I don't know,0
+65,5,67.2,5.6,five,2,penfirst,blue-right,sticker,2,transfer,1,R,L,1,my brain worked. I don't know,0
+65,5,67.2,5.6,five,2,penfirst,blue-right,sticker,2,transfer,2,L,L,1,my brain worked. I don't know,0
+65,5,67.2,5.6,five,2,penfirst,blue-right,sticker,2,transfer,3,R,R,1,my brain worked. I don't know,0
+65,5,67.2,5.6,five,2,penfirst,blue-right,sticker,2,transfer,4,L,L,1,my brain worked. I don't know,0
+65,5,67.2,5.6,five,2,penfirst,blue-right,sticker,2,transfer,5,R,R,1,my brain worked. I don't know,0
+65,5,67.2,5.6,five,2,penfirst,blue-right,sticker,2,transfer,6,L,L,1,my brain worked. I don't know,0
+65,5,67.2,5.6,five,2,penfirst,blue-right,sticker,2,transfer,7,L,L,1,my brain worked. I don't know,0
+65,5,67.2,5.6,five,2,penfirst,blue-right,sticker,2,transfer,8,R,R,1,my brain worked. I don't know,0
+66,5,66.42763158,5.535635965,five,2,stickerfirst,pink-right,pen,2,transfer,1,R,R,0,you made a hole with the pen but I can't remember,1
+66,5,66.42763158,5.535635965,five,2,stickerfirst,pink-right,pen,2,transfer,2,L,L,0,you made a hole with the pen but I can't remember,1
+66,5,66.42763158,5.535635965,five,2,stickerfirst,pink-right,pen,2,transfer,3,L,R,1,you made a hole with the pen but I can't remember,1
+66,5,66.42763158,5.535635965,five,2,stickerfirst,pink-right,pen,2,transfer,4,R,R,0,you made a hole with the pen but I can't remember,1
+66,5,66.42763158,5.535635965,five,2,stickerfirst,pink-right,pen,2,transfer,5,R,L,1,you made a hole with the pen but I can't remember,1
+66,5,66.42763158,5.535635965,five,2,stickerfirst,pink-right,pen,2,transfer,6,L,R,1,you made a hole with the pen but I can't remember,1
+66,5,66.42763158,5.535635965,five,2,stickerfirst,pink-right,pen,2,transfer,7,R,R,0,you made a hole with the pen but I can't remember,1
+66,5,66.42763158,5.535635965,five,2,stickerfirst,pink-right,pen,2,transfer,8,L,R,1,you made a hole with the pen but I can't remember,1
+66,5,66.42763158,5.535635965,five,2,stickerfirst,pink-right,sticker,1,test,1,L,R,0,you made a hole with the pen but I can't remember,1
+66,5,66.42763158,5.535635965,five,2,stickerfirst,pink-right,sticker,1,test,2,R,R,1,you made a hole with the pen but I can't remember,1
+66,5,66.42763158,5.535635965,five,2,stickerfirst,pink-right,sticker,1,test,3,R,L,0,you made a hole with the pen but I can't remember,1
+66,5,66.42763158,5.535635965,five,2,stickerfirst,pink-right,sticker,1,test,4,L,R,0,you made a hole with the pen but I can't remember,1
+66,5,66.42763158,5.535635965,five,2,stickerfirst,pink-right,sticker,1,test,5,R,L,0,you made a hole with the pen but I can't remember,1
+66,5,66.42763158,5.535635965,five,2,stickerfirst,pink-right,sticker,1,test,6,L,R,0,you made a hole with the pen but I can't remember,1
+66,5,66.42763158,5.535635965,five,2,stickerfirst,pink-right,sticker,1,test,7,L,L,1,you made a hole with the pen but I can't remember,1
+66,5,66.42763158,5.535635965,five,2,stickerfirst,pink-right,sticker,1,test,8,R,L,0,you made a hole with the pen but I can't remember,1
+72,4,56.03289474,4.669407895,four,2,stickerfirst,pink-right,pen,2,transfer,1,R,L,1,you smashed it when you put it in,1
+72,4,56.03289474,4.669407895,four,2,stickerfirst,pink-right,pen,2,transfer,2,L,R,1,you smashed it when you put it in,1
+72,4,56.03289474,4.669407895,four,2,stickerfirst,pink-right,pen,2,transfer,3,L,R,1,you smashed it when you put it in,1
+72,4,56.03289474,4.669407895,four,2,stickerfirst,pink-right,pen,2,transfer,4,R,L,1,you smashed it when you put it in,1
+72,4,56.03289474,4.669407895,four,2,stickerfirst,pink-right,pen,2,transfer,5,R,L,1,you smashed it when you put it in,1
+72,4,56.03289474,4.669407895,four,2,stickerfirst,pink-right,pen,2,transfer,6,L,L,0,you smashed it when you put it in,1
+72,4,56.03289474,4.669407895,four,2,stickerfirst,pink-right,pen,2,transfer,7,R,L,1,you smashed it when you put it in,1
+72,4,56.03289474,4.669407895,four,2,stickerfirst,pink-right,pen,2,transfer,8,L,R,1,you smashed it when you put it in,1
+72,4,56.03289474,4.669407895,four,2,stickerfirst,pink-right,sticker,1,test,1,L,L,1,you smashed it when you put it in,1
+72,4,56.03289474,4.669407895,four,2,stickerfirst,pink-right,sticker,1,test,2,R,R,1,you smashed it when you put it in,1
+72,4,56.03289474,4.669407895,four,2,stickerfirst,pink-right,sticker,1,test,3,R,R,1,you smashed it when you put it in,1
+72,4,56.03289474,4.669407895,four,2,stickerfirst,pink-right,sticker,1,test,4,L,L,1,you smashed it when you put it in,1
+72,4,56.03289474,4.669407895,four,2,stickerfirst,pink-right,sticker,1,test,5,R,R,1,you smashed it when you put it in,1
+72,4,56.03289474,4.669407895,four,2,stickerfirst,pink-right,sticker,1,test,6,L,L,1,you smashed it when you put it in,1
+72,4,56.03289474,4.669407895,four,2,stickerfirst,pink-right,sticker,1,test,7,L,L,1,you smashed it when you put it in,1
+72,4,56.03289474,4.669407895,four,2,stickerfirst,pink-right,sticker,1,test,8,R,R,1,you smashed it when you put it in,1
+73,4,55.26315789,4.605263158,four,1,stickerfirst,pink-right,pen,2,transfer,1,R,R,0,it was tricky,0
+73,4,55.26315789,4.605263158,four,1,stickerfirst,pink-right,pen,2,transfer,2,L,L,0,it was tricky,0
+73,4,55.26315789,4.605263158,four,1,stickerfirst,pink-right,pen,2,transfer,3,L,L,0,it was tricky,0
+73,4,55.26315789,4.605263158,four,1,stickerfirst,pink-right,pen,2,transfer,4,R,L,1,it was tricky,0
+73,4,55.26315789,4.605263158,four,1,stickerfirst,pink-right,pen,2,transfer,5,R,L,1,it was tricky,0
+73,4,55.26315789,4.605263158,four,1,stickerfirst,pink-right,pen,2,transfer,6,L,L,0,it was tricky,0
+73,4,55.26315789,4.605263158,four,1,stickerfirst,pink-right,pen,2,transfer,7,R,L,1,it was tricky,0
+73,4,55.26315789,4.605263158,four,1,stickerfirst,pink-right,pen,2,transfer,8,L,R,1,it was tricky,0
+73,4,55.26315789,4.605263158,four,1,stickerfirst,pink-right,sticker,1,test,1,L,L,1,it was tricky,0
+73,4,55.26315789,4.605263158,four,1,stickerfirst,pink-right,sticker,1,test,2,R,R,1,it was tricky,0
+73,4,55.26315789,4.605263158,four,1,stickerfirst,pink-right,sticker,1,test,3,R,R,1,it was tricky,0
+73,4,55.26315789,4.605263158,four,1,stickerfirst,pink-right,sticker,1,test,4,L,L,1,it was tricky,0
+73,4,55.26315789,4.605263158,four,1,stickerfirst,pink-right,sticker,1,test,5,R,R,1,it was tricky,0
+73,4,55.26315789,4.605263158,four,1,stickerfirst,pink-right,sticker,1,test,6,L,L,1,it was tricky,0
+73,4,55.26315789,4.605263158,four,1,stickerfirst,pink-right,sticker,1,test,7,L,L,1,it was tricky,0
+73,4,55.26315789,4.605263158,four,1,stickerfirst,pink-right,sticker,1,test,8,R,L,0,it was tricky,0
+78,4,49.59210526,4.132675439,four,1,stickerfirst,blue-right,pen,2,transfer,1,R,R,0,because you put it in the same cup,0
+78,4,49.59210526,4.132675439,four,1,stickerfirst,blue-right,pen,2,transfer,2,L,L,0,because you put it in the same cup,0
+78,4,49.59210526,4.132675439,four,1,stickerfirst,blue-right,pen,2,transfer,3,R,R,0,because you put it in the same cup,0
+78,4,49.59210526,4.132675439,four,1,stickerfirst,blue-right,pen,2,transfer,4,L,L,0,because you put it in the same cup,0
+78,4,49.59210526,4.132675439,four,1,stickerfirst,blue-right,pen,2,transfer,5,R,L,1,because you put it in the same cup,0
+78,4,49.59210526,4.132675439,four,1,stickerfirst,blue-right,pen,2,transfer,6,L,R,1,because you put it in the same cup,0
+78,4,49.59210526,4.132675439,four,1,stickerfirst,blue-right,pen,2,transfer,7,L,R,1,because you put it in the same cup,0
+78,4,49.59210526,4.132675439,four,1,stickerfirst,blue-right,pen,2,transfer,8,R,R,0,because you put it in the same cup,0
+78,4,49.59210526,4.132675439,four,1,stickerfirst,blue-right,sticker,1,test,1,L,R,0,because you put it in the same cup,0
+78,4,49.59210526,4.132675439,four,1,stickerfirst,blue-right,sticker,1,test,2,L,L,1,because you put it in the same cup,0
+78,4,49.59210526,4.132675439,four,1,stickerfirst,blue-right,sticker,1,test,3,R,R,1,because you put it in the same cup,0
+78,4,49.59210526,4.132675439,four,1,stickerfirst,blue-right,sticker,1,test,4,L,L,1,because you put it in the same cup,0
+78,4,49.59210526,4.132675439,four,1,stickerfirst,blue-right,sticker,1,test,5,R,L,0,because you put it in the same cup,0
+78,4,49.59210526,4.132675439,four,1,stickerfirst,blue-right,sticker,1,test,6,R,L,0,because you put it in the same cup,0
+78,4,49.59210526,4.132675439,four,1,stickerfirst,blue-right,sticker,1,test,7,L,R,0,because you put it in the same cup,0
+78,4,49.59210526,4.132675439,four,1,stickerfirst,blue-right,sticker,1,test,8,R,L,0,because you put it in the same cup,0
+83,4,54.96710526,4.580592105,four,2,penfirst,blue-right,pen,1,test,1,L,R,1,"doesn't speak much english, couldn't explain",0
+83,4,54.96710526,4.580592105,four,2,penfirst,blue-right,pen,1,test,2,R,L,1,"doesn't speak much english, couldn't explain",0
+83,4,54.96710526,4.580592105,four,2,penfirst,blue-right,pen,1,test,3,R,L,1,"doesn't speak much english, couldn't explain",0
+83,4,54.96710526,4.580592105,four,2,penfirst,blue-right,pen,1,test,4,L,R,1,"doesn't speak much english, couldn't explain",0
+83,4,54.96710526,4.580592105,four,2,penfirst,blue-right,pen,1,test,5,R,L,1,"doesn't speak much english, couldn't explain",0
+83,4,54.96710526,4.580592105,four,2,penfirst,blue-right,pen,1,test,6,L,R,1,"doesn't speak much english, couldn't explain",0
+83,4,54.96710526,4.580592105,four,2,penfirst,blue-right,pen,1,test,7,L,L,0,"doesn't speak much english, couldn't explain",0
+83,4,54.96710526,4.580592105,four,2,penfirst,blue-right,pen,1,test,8,R,L,1,"doesn't speak much english, couldn't explain",0
+83,4,54.96710526,4.580592105,four,2,penfirst,blue-right,sticker,2,transfer,1,R,L,0,"doesn't speak much english, couldn't explain",0
+83,4,54.96710526,4.580592105,four,2,penfirst,blue-right,sticker,2,transfer,2,L,L,1,"doesn't speak much english, couldn't explain",0
+83,4,54.96710526,4.580592105,four,2,penfirst,blue-right,sticker,2,transfer,3,L,R,0,"doesn't speak much english, couldn't explain",0
+83,4,54.96710526,4.580592105,four,2,penfirst,blue-right,sticker,2,transfer,4,R,R,1,"doesn't speak much english, couldn't explain",0
+83,4,54.96710526,4.580592105,four,2,penfirst,blue-right,sticker,2,transfer,5,R,R,1,"doesn't speak much english, couldn't explain",0
+83,4,54.96710526,4.580592105,four,2,penfirst,blue-right,sticker,2,transfer,6,L,L,1,"doesn't speak much english, couldn't explain",0
+83,4,54.96710526,4.580592105,four,2,penfirst,blue-right,sticker,2,transfer,7,R,R,1,"doesn't speak much english, couldn't explain",0
+83,4,54.96710526,4.580592105,four,2,penfirst,blue-right,sticker,2,transfer,8,L,L,1,"doesn't speak much english, couldn't explain",0
+85,5,67.67105263,5.639254386,five,1,penfirst,pink-right,pen,1,test,1,L,R,1,made popping gesture with foil,1
+85,5,67.67105263,5.639254386,five,1,penfirst,pink-right,pen,1,test,2,R,L,1,made popping gesture with foil,1
+85,5,67.67105263,5.639254386,five,1,penfirst,pink-right,pen,1,test,3,R,R,0,made popping gesture with foil,1
+85,5,67.67105263,5.639254386,five,1,penfirst,pink-right,pen,1,test,4,L,R,1,made popping gesture with foil,1
+85,5,67.67105263,5.639254386,five,1,penfirst,pink-right,pen,1,test,5,R,L,1,made popping gesture with foil,1
+85,5,67.67105263,5.639254386,five,1,penfirst,pink-right,pen,1,test,6,L,R,1,made popping gesture with foil,1
+85,5,67.67105263,5.639254386,five,1,penfirst,pink-right,pen,1,test,7,L,L,0,made popping gesture with foil,1
+85,5,67.67105263,5.639254386,five,1,penfirst,pink-right,pen,1,test,8,R,L,1,made popping gesture with foil,1
+85,5,67.67105263,5.639254386,five,1,penfirst,pink-right,sticker,2,transfer,1,R,R,1,made popping gesture with foil,1
+85,5,67.67105263,5.639254386,five,1,penfirst,pink-right,sticker,2,transfer,2,L,L,1,made popping gesture with foil,1
+85,5,67.67105263,5.639254386,five,1,penfirst,pink-right,sticker,2,transfer,3,L,R,0,made popping gesture with foil,1
+85,5,67.67105263,5.639254386,five,1,penfirst,pink-right,sticker,2,transfer,4,R,R,1,made popping gesture with foil,1
+85,5,67.67105263,5.639254386,five,1,penfirst,pink-right,sticker,2,transfer,5,R,L,0,made popping gesture with foil,1
+85,5,67.67105263,5.639254386,five,1,penfirst,pink-right,sticker,2,transfer,6,L,L,1,made popping gesture with foil,1
+85,5,67.67105263,5.639254386,five,1,penfirst,pink-right,sticker,2,transfer,7,R,R,1,made popping gesture with foil,1
+85,5,67.67105263,5.639254386,five,1,penfirst,pink-right,sticker,2,transfer,8,L,L,1,made popping gesture with foil,1
+87,4,52.83552632,4.402960526,four,2,stickerfirst,blue-right,pen,2,transfer,1,R,L,1,I saw you crack it,1
+87,4,52.83552632,4.402960526,four,2,stickerfirst,blue-right,pen,2,transfer,2,L,R,1,I saw you crack it,1
+87,4,52.83552632,4.402960526,four,2,stickerfirst,blue-right,pen,2,transfer,3,L,R,1,I saw you crack it,1
+87,4,52.83552632,4.402960526,four,2,stickerfirst,blue-right,pen,2,transfer,4,R,L,1,I saw you crack it,1
+87,4,52.83552632,4.402960526,four,2,stickerfirst,blue-right,pen,2,transfer,5,R,L,1,I saw you crack it,1
+87,4,52.83552632,4.402960526,four,2,stickerfirst,blue-right,pen,2,transfer,6,L,R,1,I saw you crack it,1
+87,4,52.83552632,4.402960526,four,2,stickerfirst,blue-right,pen,2,transfer,7,R,L,1,I saw you crack it,1
+87,4,52.83552632,4.402960526,four,2,stickerfirst,blue-right,pen,2,transfer,8,L,R,1,I saw you crack it,1
+87,4,52.83552632,4.402960526,four,2,stickerfirst,blue-right,sticker,1,test,1,L,L,1,I saw you crack it,1
+87,4,52.83552632,4.402960526,four,2,stickerfirst,blue-right,sticker,1,test,2,R,R,1,I saw you crack it,1
+87,4,52.83552632,4.402960526,four,2,stickerfirst,blue-right,sticker,1,test,3,R,R,1,I saw you crack it,1
+87,4,52.83552632,4.402960526,four,2,stickerfirst,blue-right,sticker,1,test,4,L,L,1,I saw you crack it,1
+87,4,52.83552632,4.402960526,four,2,stickerfirst,blue-right,sticker,1,test,5,R,R,1,I saw you crack it,1
+87,4,52.83552632,4.402960526,four,2,stickerfirst,blue-right,sticker,1,test,6,L,L,1,I saw you crack it,1
+87,4,52.83552632,4.402960526,four,2,stickerfirst,blue-right,sticker,1,test,7,L,L,1,I saw you crack it,1
+87,4,52.83552632,4.402960526,four,2,stickerfirst,blue-right,sticker,1,test,8,R,R,1,I saw you crack it,1
+88,5,63.14473684,5.262061404,five,1,stickerfirst,pink-right,pen,2,transfer,1,R,L,1,I remembered where it went,1
+88,5,63.14473684,5.262061404,five,1,stickerfirst,pink-right,pen,2,transfer,2,L,R,1,I remembered where it went,1
+88,5,63.14473684,5.262061404,five,1,stickerfirst,pink-right,pen,2,transfer,3,R,L,1,I remembered where it went,1
+88,5,63.14473684,5.262061404,five,1,stickerfirst,pink-right,pen,2,transfer,4,L,L,0,I remembered where it went,1
+88,5,63.14473684,5.262061404,five,1,stickerfirst,pink-right,pen,2,transfer,5,R,L,1,I remembered where it went,1
+88,5,63.14473684,5.262061404,five,1,stickerfirst,pink-right,pen,2,transfer,6,L,R,1,I remembered where it went,1
+88,5,63.14473684,5.262061404,five,1,stickerfirst,pink-right,pen,2,transfer,7,L,R,1,I remembered where it went,1
+88,5,63.14473684,5.262061404,five,1,stickerfirst,pink-right,pen,2,transfer,8,R,L,1,I remembered where it went,1
+88,5,63.14473684,5.262061404,five,1,stickerfirst,pink-right,sticker,1,test,1,L,L,1,I remembered where it went,1
+88,5,63.14473684,5.262061404,five,1,stickerfirst,pink-right,sticker,1,test,2,L,L,1,I remembered where it went,1
+88,5,63.14473684,5.262061404,five,1,stickerfirst,pink-right,sticker,1,test,3,R,R,1,I remembered where it went,1
+88,5,63.14473684,5.262061404,five,1,stickerfirst,pink-right,sticker,1,test,4,L,L,1,I remembered where it went,1
+88,5,63.14473684,5.262061404,five,1,stickerfirst,pink-right,sticker,1,test,5,R,R,1,I remembered where it went,1
+88,5,63.14473684,5.262061404,five,1,stickerfirst,pink-right,sticker,1,test,6,R,R,1,I remembered where it went,1
+88,5,63.14473684,5.262061404,five,1,stickerfirst,pink-right,sticker,1,test,7,L,L,1,I remembered where it went,1
+88,5,63.14473684,5.262061404,five,1,stickerfirst,pink-right,sticker,1,test,8,R,R,1,I remembered where it went,1
+89,4,53.90131579,4.491776316,four,2,penfirst,blue-right,pen,1,test,1,L,L,0,blue one. Couldn't explain,0
+89,4,53.90131579,4.491776316,four,2,penfirst,blue-right,pen,1,test,2,R,R,0,blue one. Couldn't explain,0
+89,4,53.90131579,4.491776316,four,2,penfirst,blue-right,pen,1,test,3,R,R,0,blue one. Couldn't explain,0
+89,4,53.90131579,4.491776316,four,2,penfirst,blue-right,pen,1,test,4,L,L,0,blue one. Couldn't explain,0
+89,4,53.90131579,4.491776316,four,2,penfirst,blue-right,pen,1,test,5,R,R,0,blue one. Couldn't explain,0
+89,4,53.90131579,4.491776316,four,2,penfirst,blue-right,pen,1,test,6,L,R,1,blue one. Couldn't explain,0
+89,4,53.90131579,4.491776316,four,2,penfirst,blue-right,pen,1,test,7,L,L,0,blue one. Couldn't explain,0
+89,4,53.90131579,4.491776316,four,2,penfirst,blue-right,pen,1,test,8,R,R,0,blue one. Couldn't explain,0
+89,4,53.90131579,4.491776316,four,2,penfirst,blue-right,sticker,2,transfer,1,R,L,0,blue one. Couldn't explain,0
+89,4,53.90131579,4.491776316,four,2,penfirst,blue-right,sticker,2,transfer,2,L,L,1,blue one. Couldn't explain,0
+89,4,53.90131579,4.491776316,four,2,penfirst,blue-right,sticker,2,transfer,3,L,L,1,blue one. Couldn't explain,0
+89,4,53.90131579,4.491776316,four,2,penfirst,blue-right,sticker,2,transfer,4,R,L,0,blue one. Couldn't explain,0
+89,4,53.90131579,4.491776316,four,2,penfirst,blue-right,sticker,2,transfer,5,R,R,1,blue one. Couldn't explain,0
+89,4,53.90131579,4.491776316,four,2,penfirst,blue-right,sticker,2,transfer,6,L,R,0,blue one. Couldn't explain,0
+89,4,53.90131579,4.491776316,four,2,penfirst,blue-right,sticker,2,transfer,7,R,L,0,blue one. Couldn't explain,0
+89,4,53.90131579,4.491776316,four,2,penfirst,blue-right,sticker,2,transfer,8,L,L,1,blue one. Couldn't explain,0
+91,5,64.96710526,5.413925439,five,2,penfirst,blue-right,pen,1,test,1,L,L,0,there was a pattern. RLRL,0
+91,5,64.96710526,5.413925439,five,2,penfirst,blue-right,pen,1,test,2,L,L,0,there was a pattern. RLRL,0
+91,5,64.96710526,5.413925439,five,2,penfirst,blue-right,pen,1,test,3,R,R,0,there was a pattern. RLRL,0
+91,5,64.96710526,5.413925439,five,2,penfirst,blue-right,pen,1,test,4,L,R,1,there was a pattern. RLRL,0
+91,5,64.96710526,5.413925439,five,2,penfirst,blue-right,pen,1,test,5,R,L,1,there was a pattern. RLRL,0
+91,5,64.96710526,5.413925439,five,2,penfirst,blue-right,pen,1,test,6,R,L,1,there was a pattern. RLRL,0
+91,5,64.96710526,5.413925439,five,2,penfirst,blue-right,pen,1,test,7,L,R,1,there was a pattern. RLRL,0
+91,5,64.96710526,5.413925439,five,2,penfirst,blue-right,pen,1,test,8,R,L,1,there was a pattern. RLRL,0
+91,5,64.96710526,5.413925439,five,2,penfirst,blue-right,sticker,2,transfer,1,R,R,1,there was a pattern. RLRL,0
+91,5,64.96710526,5.413925439,five,2,penfirst,blue-right,sticker,2,transfer,2,L,L,1,there was a pattern. RLRL,0
+91,5,64.96710526,5.413925439,five,2,penfirst,blue-right,sticker,2,transfer,3,R,R,1,there was a pattern. RLRL,0
+91,5,64.96710526,5.413925439,five,2,penfirst,blue-right,sticker,2,transfer,4,L,L,1,there was a pattern. RLRL,0
+91,5,64.96710526,5.413925439,five,2,penfirst,blue-right,sticker,2,transfer,5,R,R,1,there was a pattern. RLRL,0
+91,5,64.96710526,5.413925439,five,2,penfirst,blue-right,sticker,2,transfer,6,L,L,1,there was a pattern. RLRL,0
+91,5,64.96710526,5.413925439,five,2,penfirst,blue-right,sticker,2,transfer,7,L,L,1,there was a pattern. RLRL,0
+91,5,64.96710526,5.413925439,five,2,penfirst,blue-right,sticker,2,transfer,8,R,R,1,there was a pattern. RLRL,0
+92,5,60.53947368,5.04495614,five,1,stickerfirst,pink-right,pen,2,transfer,1,R,L,1,because you did pen first,1
+92,5,60.53947368,5.04495614,five,1,stickerfirst,pink-right,pen,2,transfer,2,L,R,1,because you did pen first,1
+92,5,60.53947368,5.04495614,five,1,stickerfirst,pink-right,pen,2,transfer,3,L,L,0,because you did pen first,1
+92,5,60.53947368,5.04495614,five,1,stickerfirst,pink-right,pen,2,transfer,4,R,L,1,because you did pen first,1
+92,5,60.53947368,5.04495614,five,1,stickerfirst,pink-right,pen,2,transfer,5,R,L,1,because you did pen first,1
+92,5,60.53947368,5.04495614,five,1,stickerfirst,pink-right,pen,2,transfer,6,L,R,1,because you did pen first,1
+92,5,60.53947368,5.04495614,five,1,stickerfirst,pink-right,pen,2,transfer,7,R,L,1,because you did pen first,1
+92,5,60.53947368,5.04495614,five,1,stickerfirst,pink-right,pen,2,transfer,8,L,R,1,because you did pen first,1
+92,5,60.53947368,5.04495614,five,1,stickerfirst,pink-right,sticker,1,test,1,L,L,1,because you did pen first,1
+92,5,60.53947368,5.04495614,five,1,stickerfirst,pink-right,sticker,1,test,2,R,R,1,because you did pen first,1
+92,5,60.53947368,5.04495614,five,1,stickerfirst,pink-right,sticker,1,test,3,R,R,1,because you did pen first,1
+92,5,60.53947368,5.04495614,five,1,stickerfirst,pink-right,sticker,1,test,4,L,L,1,because you did pen first,1
+92,5,60.53947368,5.04495614,five,1,stickerfirst,pink-right,sticker,1,test,5,R,R,1,because you did pen first,1
+92,5,60.53947368,5.04495614,five,1,stickerfirst,pink-right,sticker,1,test,6,L,L,1,because you did pen first,1
+92,5,60.53947368,5.04495614,five,1,stickerfirst,pink-right,sticker,1,test,7,L,L,1,because you did pen first,1
+92,5,60.53947368,5.04495614,five,1,stickerfirst,pink-right,sticker,1,test,8,R,R,1,because you did pen first,1
+94,4,51.80263158,4.316885965,four,2,stickerfirst,pink-right,pen,2,transfer,1,R,R,0,"don't remember, can't remember",0
+94,4,51.80263158,4.316885965,four,2,stickerfirst,pink-right,pen,2,transfer,2,L,L,0,"don't remember, can't remember",0
+94,4,51.80263158,4.316885965,four,2,stickerfirst,pink-right,pen,2,transfer,3,R,R,0,"don't remember, can't remember",0
+94,4,51.80263158,4.316885965,four,2,stickerfirst,pink-right,pen,2,transfer,4,L,R,1,"don't remember, can't remember",0
+94,4,51.80263158,4.316885965,four,2,stickerfirst,pink-right,pen,2,transfer,5,R,L,1,"don't remember, can't remember",0
+94,4,51.80263158,4.316885965,four,2,stickerfirst,pink-right,pen,2,transfer,6,L,L,0,"don't remember, can't remember",0
+94,4,51.80263158,4.316885965,four,2,stickerfirst,pink-right,pen,2,transfer,7,L,R,1,"don't remember, can't remember",0
+94,4,51.80263158,4.316885965,four,2,stickerfirst,pink-right,pen,2,transfer,8,R,L,1,"don't remember, can't remember",0
+94,4,51.80263158,4.316885965,four,2,stickerfirst,pink-right,sticker,1,test,1,L,L,1,"don't remember, can't remember",0
+94,4,51.80263158,4.316885965,four,2,stickerfirst,pink-right,sticker,1,test,2,L,L,1,"don't remember, can't remember",0
+94,4,51.80263158,4.316885965,four,2,stickerfirst,pink-right,sticker,1,test,3,R,L,0,"don't remember, can't remember",0
+94,4,51.80263158,4.316885965,four,2,stickerfirst,pink-right,sticker,1,test,4,L,L,1,"don't remember, can't remember",0
+94,4,51.80263158,4.316885965,four,2,stickerfirst,pink-right,sticker,1,test,5,R,R,1,"don't remember, can't remember",0
+94,4,51.80263158,4.316885965,four,2,stickerfirst,pink-right,sticker,1,test,6,R,R,1,"don't remember, can't remember",0
+94,4,51.80263158,4.316885965,four,2,stickerfirst,pink-right,sticker,1,test,7,L,L,1,"don't remember, can't remember",0
+94,4,51.80263158,4.316885965,four,2,stickerfirst,pink-right,sticker,1,test,8,R,R,1,"don't remember, can't remember",0
+97,5,71.26315789,5.938596491,five,1,penfirst,blue-right,pen,1,test,1,L,R,1,I've got good memory. I listened to my mind and not the pen,0
+97,5,71.26315789,5.938596491,five,1,penfirst,blue-right,pen,1,test,2,L,R,1,I've got good memory. I listened to my mind and not the pen,0
+97,5,71.26315789,5.938596491,five,1,penfirst,blue-right,pen,1,test,3,R,L,1,I've got good memory. I listened to my mind and not the pen,0
+97,5,71.26315789,5.938596491,five,1,penfirst,blue-right,pen,1,test,4,L,R,1,I've got good memory. I listened to my mind and not the pen,0
+97,5,71.26315789,5.938596491,five,1,penfirst,blue-right,pen,1,test,5,R,L,1,I've got good memory. I listened to my mind and not the pen,0
+97,5,71.26315789,5.938596491,five,1,penfirst,blue-right,pen,1,test,6,R,L,1,I've got good memory. I listened to my mind and not the pen,0
+97,5,71.26315789,5.938596491,five,1,penfirst,blue-right,pen,1,test,7,L,R,1,I've got good memory. I listened to my mind and not the pen,0
+97,5,71.26315789,5.938596491,five,1,penfirst,blue-right,pen,1,test,8,R,L,1,I've got good memory. I listened to my mind and not the pen,0
+97,5,71.26315789,5.938596491,five,1,penfirst,blue-right,sticker,2,transfer,1,R,R,1,I've got good memory. I listened to my mind and not the pen,0
+97,5,71.26315789,5.938596491,five,1,penfirst,blue-right,sticker,2,transfer,2,L,L,1,I've got good memory. I listened to my mind and not the pen,0
+97,5,71.26315789,5.938596491,five,1,penfirst,blue-right,sticker,2,transfer,3,R,R,1,I've got good memory. I listened to my mind and not the pen,0
+97,5,71.26315789,5.938596491,five,1,penfirst,blue-right,sticker,2,transfer,4,L,L,1,I've got good memory. I listened to my mind and not the pen,0
+97,5,71.26315789,5.938596491,five,1,penfirst,blue-right,sticker,2,transfer,5,R,R,1,I've got good memory. I listened to my mind and not the pen,0
+97,5,71.26315789,5.938596491,five,1,penfirst,blue-right,sticker,2,transfer,6,L,L,1,I've got good memory. I listened to my mind and not the pen,0
+97,5,71.26315789,5.938596491,five,1,penfirst,blue-right,sticker,2,transfer,7,L,L,1,I've got good memory. I listened to my mind and not the pen,0
+97,5,71.26315789,5.938596491,five,1,penfirst,blue-right,sticker,2,transfer,8,R,R,1,I've got good memory. I listened to my mind and not the pen,0
+100,5,60.40789474,5.033991228,five,2,penfirst,pink-right,pen,1,test,1,L,R,1,I heard it. I picked the right one,0
+100,5,60.40789474,5.033991228,five,2,penfirst,pink-right,pen,1,test,2,R,L,1,I heard it. I picked the right one,0
+100,5,60.40789474,5.033991228,five,2,penfirst,pink-right,pen,1,test,3,R,L,1,I heard it. I picked the right one,0
+100,5,60.40789474,5.033991228,five,2,penfirst,pink-right,pen,1,test,4,L,R,1,I heard it. I picked the right one,0
+100,5,60.40789474,5.033991228,five,2,penfirst,pink-right,pen,1,test,5,R,L,1,I heard it. I picked the right one,0
+100,5,60.40789474,5.033991228,five,2,penfirst,pink-right,pen,1,test,6,L,R,1,I heard it. I picked the right one,0
+100,5,60.40789474,5.033991228,five,2,penfirst,pink-right,pen,1,test,7,L,R,1,I heard it. I picked the right one,0
+100,5,60.40789474,5.033991228,five,2,penfirst,pink-right,pen,1,test,8,R,L,1,I heard it. I picked the right one,0
+100,5,60.40789474,5.033991228,five,2,penfirst,pink-right,sticker,2,transfer,1,R,R,1,I heard it. I picked the right one,0
+100,5,60.40789474,5.033991228,five,2,penfirst,pink-right,sticker,2,transfer,2,L,L,1,I heard it. I picked the right one,0
+100,5,60.40789474,5.033991228,five,2,penfirst,pink-right,sticker,2,transfer,3,L,L,1,I heard it. I picked the right one,0
+100,5,60.40789474,5.033991228,five,2,penfirst,pink-right,sticker,2,transfer,4,R,R,1,I heard it. I picked the right one,0
+100,5,60.40789474,5.033991228,five,2,penfirst,pink-right,sticker,2,transfer,5,R,R,1,I heard it. I picked the right one,0
+100,5,60.40789474,5.033991228,five,2,penfirst,pink-right,sticker,2,transfer,6,L,R,0,I heard it. I picked the right one,0
+100,5,60.40789474,5.033991228,five,2,penfirst,pink-right,sticker,2,transfer,7,R,R,1,I heard it. I picked the right one,0
+100,5,60.40789474,5.033991228,five,2,penfirst,pink-right,sticker,2,transfer,8,L,L,1,I heard it. I picked the right one,0
+106,5,61.09868421,5.091557018,five,1,stickerfirst,pink-right,pen,2,transfer,1,R,,1,because you put them one at a time,0
+106,5,61.09868421,5.091557018,five,1,stickerfirst,pink-right,pen,2,transfer,2,L,,1,because you put them one at a time,0
+106,5,61.09868421,5.091557018,five,1,stickerfirst,pink-right,pen,2,transfer,3,L,,1,because you put them one at a time,0
+106,5,61.09868421,5.091557018,five,1,stickerfirst,pink-right,pen,2,transfer,4,R,,1,because you put them one at a time,0
+106,5,61.09868421,5.091557018,five,1,stickerfirst,pink-right,pen,2,transfer,5,R,,1,because you put them one at a time,0
+106,5,61.09868421,5.091557018,five,1,stickerfirst,pink-right,pen,2,transfer,6,L,,1,because you put them one at a time,0
+106,5,61.09868421,5.091557018,five,1,stickerfirst,pink-right,pen,2,transfer,7,R,,1,because you put them one at a time,0
+106,5,61.09868421,5.091557018,five,1,stickerfirst,pink-right,pen,2,transfer,8,L,,1,because you put them one at a time,0
+106,5,61.09868421,5.091557018,five,1,stickerfirst,pink-right,sticker,1,test,1,L,,1,because you put them one at a time,0
+106,5,61.09868421,5.091557018,five,1,stickerfirst,pink-right,sticker,1,test,2,R,,1,because you put them one at a time,0
+106,5,61.09868421,5.091557018,five,1,stickerfirst,pink-right,sticker,1,test,3,R,,1,because you put them one at a time,0
+106,5,61.09868421,5.091557018,five,1,stickerfirst,pink-right,sticker,1,test,4,L,,1,because you put them one at a time,0
+106,5,61.09868421,5.091557018,five,1,stickerfirst,pink-right,sticker,1,test,5,R,,1,because you put them one at a time,0
+106,5,61.09868421,5.091557018,five,1,stickerfirst,pink-right,sticker,1,test,6,L,,1,because you put them one at a time,0
+106,5,61.09868421,5.091557018,five,1,stickerfirst,pink-right,sticker,1,test,7,L,,1,because you put them one at a time,0
+106,5,61.09868421,5.091557018,five,1,stickerfirst,pink-right,sticker,1,test,8,R,,1,because you put them one at a time,0
