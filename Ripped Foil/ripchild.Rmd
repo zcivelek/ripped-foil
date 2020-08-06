@@ -493,7 +493,7 @@ ci.data<-ci.data[toDelete,]
 
 scatter.int2 <- ggplot(ci.data, aes(y = fitted)) +
   geom_point(data=ripchild_separate2, aes(x = agemonths, y = correct), size = ripchild_separate2$n, alpha = 0.8) +
-  facet_wrap(~order3) + geom_segment(mapping=aes(x=44, xend=44, y=0, yend=0.5, order3="transfer"), arrow=arrow(length=unit(0.2,"cm")))+ geom_segment(mapping=aes(x=40, xend=40, y=0, yend=0.5, order3="test"), arrow=arrow(length=unit(0.2,"cm"))) +
+  facet_wrap(~order3) + geom_segment(data=data.frame(order3="transfer"), mapping=aes(x=44, xend=44, y=0, yend=0.5, order3="transfer"), arrow=arrow(length=unit(0.2,"cm")))+ geom_segment(data=data.frame(order3="test"), mapping=aes(x=40, xend=40, y=0, yend=0.5, order3="test"), arrow=arrow(length=unit(0.2,"cm"))) +
   geom_ribbon(data = ci.data%>%filter(order3=="test"), aes(x = plot.int, y = fitted, ymin = lower.cl, ymax = upper.cl, group = order3), fill = "grey", alpha = 0.5) +
   geom_line(data = ci.data%>%filter(order3=="test"), aes(x = plot.int, y = fitted), lty = 2) +
     geom_ribbon(data = ci.data%>%filter(order3=="transfer"), aes(x = plot.int, y = fitted, ymin = lower.cl, ymax = upper.cl, group = order3), fill = "grey", alpha = 0.5) +
@@ -555,6 +555,8 @@ ggplot(ripchild_1st_trial, aes(x=agemonths, y=correct)) + geom_point() +
 
 ```{r}
 openended<-read.csv("open_ended_ripped.csv", header=T)
+openended$explanation<-as.factor(openended$explanation)
+
 openended$z.age=as.vector(scale(openended$agemonths))
 str(openended)
 table(openended$explanation)
@@ -582,10 +584,28 @@ ggplot(openended, aes(x=agemonths, y=explanation)) + geom_point() +
 ```{r}
 #Comparing the performance of those who gave correct explanations to an age matched group
 agematched<-read.csv("agematched_explanation.csv", header=T)
+agematched$explanation<-as.factor(agematched$explanation)
+agematched$id<-as.factor(agematched$id)
+agematched$sex<-as.factor(agematched$sex)
+agematched$z.age=as.vector(scale(agematched$agemonths))
+agematched$z.trialno=as.vector(scale(agematched$trialno))
+
 str(agematched)
 table(agematched$explanation)
 
+agecomp<-glmer(correct ~ explanation + z.trialno + (1|id), data=agematched, family=binomial, control=contr)
+nullage<- glmer(correct ~ 1 + z.trialno + (1|id), data=agematched, family=binomial, control=contr)
+round(anova(agecomp, nullage, test="Chisq"),3)
 
+correctexplanation <-agematched%>%
+  filter(explanation == "1")
+testcorrect <- glmer(correct ~ 1 + (1 | id), data= correctexplanation, family=binomial)
+summary(testcorrect)
+
+incorrectexplanation <-agematched%>%
+  filter(explanation == "0")
+testincorrect <- glmer(correct ~ 1 + (1| id),data= incorrectexplanation, family=binomial)
+summary(testincorrect)
 
 ```
 
