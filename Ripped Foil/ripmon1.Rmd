@@ -48,6 +48,9 @@ ripmon1$sex<-as.factor(ripmon1$sex)
 ripmon1$phase2<-as.factor(ripmon1$phase2)
 
 str(ripmon1)
+summary(ripmon1)
+sd(ripmon1$trialno)
+sd(ripmon1$age)
 
 ```
 
@@ -143,6 +146,7 @@ boxplot1 <- ggplot(ripmon_separate, aes(x=phase, y=correct)) +
     geom_dotplot(binaxis='y', stackdir='center', dotsize=0.5) + ylim(0,1)
 boxplot1 + stat_summary(fun.data="mean_sdl", fun.args = list(mult=1), geom="crossbar", width=0.5) + stat_summary(fun=mean, geom="point", color="red")+theme_bw() + stat_summary(fun.data=mean_sdl, fun.args = list(mult=1), 
                  geom="pointrange", color="red")+ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+geom_hline(yintercept=0.50, color='red', linetype="dashed")+xlab("Phase") + ylab("Mean number of correct responses in 16 trials")
+boxplot1
 ```
 
 ##Preparation of the data for running the GLMM
@@ -257,10 +261,10 @@ round(xdrop1,3)
 ```{r, include=FALSE}
 ####Confidence intervals for the full model with the interaction
 
-# ripmon_model1=boot.glmm.pred(model.res=full, excl.warnings=T, nboots=1000, para=T)
-# save.image("ripmon_model1_CIs.RData")
-# load("ripmon_model1_CIs.RData")
-# round(ripmon_model1$ci.estimates, 3)
+#ripmon_model1=boot.glmm.pred(model.res=full, excl.warnings=T, nboots=1000, para=T)
+#save.image("ripmon_model1_CIs.RData")
+load("ripmon_model1_CIs.RData")
+round(ripmon_model1$ci.estimates, 3)
 
 ```
 
@@ -317,10 +321,10 @@ print(summary(full2), corr=FALSE)
 ```{r, include=FALSE}
 ####Confidence intervals for the reduced model without the interaction
 
-# ripmon_model2=boot.glmm.pred(model.res=full2, excl.warnings=T, nboots=1000, para=T)
-# save.image("ripmon_model2_CIs.RData")
-# load("ripmon_model2_CIs.RData")
-# round(ripmon_model2$ci.estimates, 3)
+#ripmon_model2=boot.glmm.pred(model.res=full2, excl.warnings=T, nboots=1000, para=T)
+#save.image("ripmon_model2_CIs.RData")
+load("ripmon_model2_CIs.RData")
+round(ripmon_model2$ci.estimates, 3)
 ```
 
 ####Calculating effect sizes for the final model
@@ -358,7 +362,7 @@ ripmon_individual4<-ripmon1 %>%
 
 p3 <- ggplot(data=ripmon_individual4, aes(x=sex, y=foil.correct, group=sex)) + geom_boxplot()+ylim(0,1)+ geom_point(size = ripmon_individual4$n, colour = "darkgrey", alpha=0.3) +labs(x="",y="Mean number of correct choices")+theme_few()+ggtitle("Sex")+geom_hline(yintercept=0.5, linetype="dashed", color = "red")
 
-grid.arrange(p1, p2, p3, nrow = 1, heights=unit(100, "mm"))
+grid.arrange(p1, p2, nrow = 1, heights=unit(100, "mm"))
 ```
 We will probably not include sex in the paper and it'll just be phase and trial type. Overall, monkeys performed better in food-stick trials than in stick-food trials and males better than females. Performance in Test and Transfer Phases did not differ.
 

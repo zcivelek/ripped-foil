@@ -47,6 +47,7 @@ ripchild$id<-as.factor(ripchild$id)
 ripchild$sex<-as.factor(ripchild$sex)
 str(ripchild)
 summary(ripchild)
+mean(ripchild$agemonths)
 sd(ripchild$agemonths)
 sd(ripchild$trialno)
 ```
@@ -103,6 +104,9 @@ ripchild_individual <- ripchild %>%
   ungroup()%>%
   group_by(agemonths)%>%
     add_count(correct)
+
+mean(ripchild_individual$agemonths)
+sd(ripchild_individual$agemonths)
 
 ripchild_test <- ripchild %>%
   filter(order3=="test") %>%
@@ -594,17 +598,17 @@ str(agematched)
 table(agematched$explanation)
 
 agecomp<-glmer(correct ~ explanation + z.trialno + (1|id), data=agematched, family=binomial, control=contr)
-nullage<- glmer(correct ~ 1 + z.trialno + (1|id), data=agematched, family=binomial, control=contr)
+nullage<- glmer(correct ~ z.trialno + (1|id), data=agematched, family=binomial, control=contr)
 round(anova(agecomp, nullage, test="Chisq"),3)
 
 correctexplanation <-agematched%>%
   filter(explanation == "1")
-testcorrect <- glmer(correct ~ 1 + (1 | id), data= correctexplanation, family=binomial)
+testcorrect <- glmer(correct ~ 1 + (z.trialno | id), data= correctexplanation, family=binomial)
 summary(testcorrect)
 
 incorrectexplanation <-agematched%>%
   filter(explanation == "0")
-testincorrect <- glmer(correct ~ 1 + (1| id),data= incorrectexplanation, family=binomial)
+testincorrect <- glmer(correct ~ 1 + (z.trialno| id),data= incorrectexplanation, family=binomial)
 summary(testincorrect)
 
 ```
