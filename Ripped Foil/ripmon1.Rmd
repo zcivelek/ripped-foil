@@ -347,6 +347,7 @@ ripmon_individual2<-ripmon1 %>%
   add_count(foil.correct)
 
 p1 <- ggplot(data=ripmon_individual2, aes(x=phase, y=foil.correct, group=phase)) + geom_boxplot()+geom_point(size = ripmon_individual2$n, colour = "darkgrey", alpha=0.3) + geom_line(aes(group = id), colour = "darkgrey", alpha = 0.5)+labs(x="",y="Mean number of correct choices")+theme_few()+ggtitle("Phase")+geom_hline(yintercept=0.5, linetype="dashed", color = "red")+ylim(0,1)
+p1
 
 ripmon_individual3 <- ripmon1 %>% 
   group_by(trialtype, id) %>% 
@@ -393,6 +394,7 @@ testphase <-ripmon1%>%
   filter(phase == "test")
 testchance <- glmer(correct ~ 1 + (z.trialno | id),data= testphase, family=binomial)
 summary(testchance)
+confint(object=testchance)
 ```
 
 **The intercept is significant: Performance in Test phase is above chance level.**
