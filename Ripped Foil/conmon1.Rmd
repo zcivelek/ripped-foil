@@ -405,5 +405,59 @@ p + geom_bar(stat = "identity", position = position_dodge(0.9), width = 0.8) + g
 ```
 
 
+```{r}
+corrmon<-read.csv("monkey correlation food.csv", header=T)
+corrmon_food <- corrmon %>%
+  filter(trialtype=="food") %>%
+  group_by(id) 
+
+corrmon_stick <- corrmon %>%
+  filter(trialtype=="stick") %>%
+  group_by(id) 
+
+
+corrfood_individual <- corrmon_food %>%
+  filter(!is.na(concorrect))%>%
+  group_by(id) %>%
+  summarize(correct1 = mean(ripcorrect), correct2=mean(concorrect))
+
+corrstick_individual <- corrmon_stick %>%
+  filter(!is.na(concorrect))%>%
+  group_by(id) %>%
+  summarize(correct1 = mean(ripcorrect), correct2=mean(concorrect))
+
+
+
+#install.packages("Hmisc")
+#install.packages("ggm")
+#install.packages("polycor")
+library(Hmisc)
+library(ggm)
+library(polycor)
+
+
+scattercorr<-ggplot(corrfood_individual, aes(correct1, correct2))
+scattercorr+geom_point()
+cor.test(corrfood_individual$correct1, corrfood_individual$correct2, alternative="two.sided", method="pearson")
+
+
+scattercorr2<-ggplot(corrstick_individual, aes(correct1, correct2))
+scattercorr2+geom_point()
+cor.test(corrstick_individual$correct1, corrstick_individual$correct2, alternative="two.sided", method="pearson")
+
+#they are not normally distributed so ran a bootstrapping correlation..
+boot1<-function(corrfood_individual, i)cor(corrfood_individual$correct1[i],corrfood_individual$correct2[i], use="complete.obs", method="pearson")
+library(boot)
+boot_food<-boot(corrfood_individual, boot1, 2000)
+boot_food
+boot.ci(boot_food)
+#the bias is very small and the normal CI does not include 0 so we can be sure that the positive correlation is meaningful for food-stick trials in Exp 2 and 3
+
+boot2<-function(corrstick_individual, i)cor(corrstick_individual$correct1[i],corrstick_individual$correct2[i], use="complete.obs", method="pearson")
+boot_stick<-boot(corrstick_individual, boot2, 2000)
+boot_stick
+boot.ci(boot_stick)
+#I would retain the results for the stick trials as well. The bias is very small but the CIs include the 0. We cannot say the correlation is meaningful. 
+```
 
 
