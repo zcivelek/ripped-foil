@@ -314,9 +314,9 @@ p1 <- ggplot(data=conmon_separate, aes(x=phase, y=correct, group=phase)) + geom_
 #added p3 to show trial type in different colors
 p3 <- ggplot(data=conmon_separate) + geom_boxplot(aes(x=phase, y=correct, group=phase))+ylim(0,1)+geom_point(aes(x=phase, y=correct, color=trialtype),size = conmon_separate$n, colour = "darkgrey", alpha=0.3) + geom_line(aes(x=phase, y= correct, group=id, color=trialtype)) + labs(x="",y="Mean number of correct choices")+theme_few()+ggtitle("Phase")+geom_hline(yintercept=0.5, linetype="dashed", color = "red")
 
-p3+scale_fill_continuous(guide = guide_legend()) +
+p4<-p3+scale_fill_continuous(guide = guide_legend()) +
     theme(legend.position="bottom")
-p3
+
 conmon_individual2 <- conmon1 %>% 
   group_by(trialtype, id) %>% 
   summarize(correct = mean(correct)) %>% 
@@ -324,7 +324,7 @@ conmon_individual2 <- conmon1 %>%
 p2 <- ggplot(data=conmon_individual2, aes(x=trialtype, y=correct, group=trialtype)) +geom_boxplot()+ylim(0,1)+geom_point(size = conmon_individual2$n, colour = "darkgrey", alpha=0.3) +geom_line(aes(group = id), colour = "darkgrey", alpha = 0.5)+labs(x="",y="Mean number of correct choices")+ theme_few()+ggtitle("Trial type")+geom_hline(yintercept=0.5, linetype="dashed", color = "red")
 
 
-grid.arrange(p3, p2, nrow = 1, heights=unit(100, "mm"))
+grid.arrange(p4, p2, nrow = 1, heights=unit(100, "mm"))
 ```
 
 
