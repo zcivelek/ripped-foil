@@ -45,7 +45,9 @@ The structure of the data is shown below with all the variable names and levels 
 ```{r, echo=FALSE}
 ripmon1$id<-as.factor(ripmon1$id)
 ripmon1$sex<-as.factor(ripmon1$sex)
+ripmon1$trialtype<-as.factor(ripmon1$trialtype)
 ripmon1$phase2<-as.factor(ripmon1$phase2)
+ripmon1$phase<-as.factor(ripmon1$phase)
 
 str(ripmon1)
 summary(ripmon1)
@@ -171,6 +173,7 @@ ripmon1$phase.transfer=as.numeric(ripmon1$phase==levels(ripmon1$phase)[2])
 ripmon1$trialtype.food.c<-ripmon1$trialtype.food-mean(ripmon1$trialtype.food)
 ripmon1$phase.transfer.c=ripmon1$phase.transfer-mean(ripmon1$phase.transfer)
 ripmon1$sex.m.c<-ripmon1$sex.m -mean(ripmon1$sex.m)
+summary(ripmon1)
 
 ```
 
@@ -478,6 +481,8 @@ str(ripmon3)
 ripmon3$id<-as.factor(ripmon3$id)
 ripmon3$sex<-as.factor(ripmon3$sex)
 ripmon3$phase<-as.factor(ripmon3$phase)
+ripmon3$sessiontype<-as.factor(ripmon3$sessiontype)
+
 ripmon3$trialtype<-as.factor(ripmon3$trialtype)
 
 
@@ -489,12 +494,12 @@ ripmon3$trialtype<-relevel(ripmon3$trialtype, ref = "stick")
 #coding dummy variables before centering the slopes
 ripmon3$trialtype.food<-as.numeric(ripmon3$trialtype==levels(ripmon3$trialtype)[2])
 ripmon3$sex.m<-as.numeric(ripmon3$sex==levels(ripmon3$sex)[2])
-ripmon3$phase.transfer=as.numeric(ripmon3$phase==levels(ripmon3$phase)[2])
+ripmon3$sessiontype.transfer=as.numeric(ripmon3$sessiontype==levels(ripmon3$sessiontype)[2])
 
 #centering the slopes: p-values of the factors can be influenced by the choice of reference category.
 #by centering the factor for the random slope components the p-values should be the same irrespective of the choice of the reference level
 ripmon3$trialtype.food.c<-ripmon3$trialtype.food-mean(ripmon3$trialtype.food)
-ripmon3$phase.transfer.c=ripmon3$phase.transfer-mean(ripmon3$phase.transfer)
+ripmon3$sessiontype.transfer.c=ripmon3$sessiontype.transfer-mean(ripmon3$sessiontype.transfer)
 ripmon3$sex.m.c<-ripmon3$sex.m -mean(ripmon3$sex.m)
 
 summary(ripmon3)
@@ -509,9 +514,48 @@ summary(ripmon3)
 
 contr<-glmerControl(optimizer="bobyqa", optCtrl=list(maxfun=10000000))
 
-full.CI.int <- glmer(correct ~ trialtype.food.c + z.age + sex.m.c + z.trialno*phase+(1|id)+(0+z.trialno+phase.transfer.c+trialtype.food.c|id), data=ripmon3, family=binomial, control=contr)
+full.CI.int <- glmer(correct ~ trialtype.food.c + z.age + sex.m.c + z.trialno*sessiontype+ (1|id)+(0+z.trialno+sessiontype.transfer.c+trialtype.food.c|id), data=ripmon3, family=binomial, control=contr)
+
+boot.res.int=boot.glmm.pred(model.res=full.CI.int, excl.warnings=T, nboots=5, resol=80, level=0.95, use="z.trialno", n.cores="all-1", para=T)
+
+boot.res.int$ci.estimates
+boot.res.int$ci.predicted
+
+
+
 ```
 
+```{r}
+ripmon_separate2 <- ripmon3 %>%
+  group_by(trialno, sessiontype) %>% 
+  summarize(correct= mean(correct))%>%
+  ungroup()%>%
+  group_by(trialno, sessiontype)%>%
+    add_count(correct)
+
+plot.int=seq(from=min(ripmon_separate2$trialno),
+             to=max(ripmon_separate2$trialno),length.out=80)
+
+ci.data<-boot.res.int$ci.predicted #I reduced the number of values for the confidence intervals. did not match the actual data.
+toDelete<- seq(1, nrow(ci.data),2)
+ci.data<-ci.data[toDelete,]
+
+scatter.int2 <- ggplot(ci.data, aes(y = fitted)) +
+  geom_point(data=ripmon_separate2, aes(x = trialno, y = correct), size = ripmon_separate2$n, alpha = 0.8) +
+  facet_wrap(~sessiontype) +
+  geom_ribbon(data = ci.data%>%filter(sessiontype=="test"), aes(x = plot.int, y = fitted, ymin = lower.cl, ymax = upper.cl, group = sessiontype), fill = "grey", alpha = 0.5) +
+  geom_line(data = ci.data%>%filter(sessiontype=="test"), aes(x = plot.int, y = fitted), lty = 2) +
+    geom_ribbon(data = ci.data%>%filter(sessiontype=="transfer"), aes(x = plot.int, y = fitted, ymin = lower.cl, ymax = upper.cl, group = sessiontype), fill = "grey", alpha = 0.5) +
+  geom_line(data = ci.data%>%filter(sessiontype=="transfer"), aes(x = plot.int, y = fitted), lty = 2) + scale_x_continuous(breaks = seq(from = 1, to = 80, by = 8)) +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  xlab("Trial number") +
+  ylab("Mean correct responses") +
+  ylim(0, 1) +
+  geom_hline(yintercept = 0.50, color = "red", linetype = "dashed")
+
+scatter.int2
+```
 
 
 
