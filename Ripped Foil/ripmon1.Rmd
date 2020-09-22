@@ -466,6 +466,52 @@ summary(test8chance)
 ```
 **No, they are at chance level in the first 8 trials of Test phase.**
 
+```{r}
+#Amanda requested to see how monkeys' performance changed throughout trials of Test and Transfer phase (faceted)- to show visually that performance gets better over time.
+
+###First do all the transformations 
+
+
+ripmon3<-read.csv("ripped_monkey_complete_testtransfer.csv", header=T)
+str(ripmon3)
+
+ripmon3$id<-as.factor(ripmon3$id)
+ripmon3$sex<-as.factor(ripmon3$sex)
+ripmon3$phase<-as.factor(ripmon3$phase)
+ripmon3$trialtype<-as.factor(ripmon3$trialtype)
+
+
+#We scale variables so that the differences in the range of the variables do not influence the parameter estimations.
+ripmon3$z.trialno<-as.vector(scale(ripmon3$trialno))
+ripmon3$z.age=as.vector(scale(ripmon3$age))
+ripmon3$trialtype<-relevel(ripmon3$trialtype, ref = "stick")
+
+#coding dummy variables before centering the slopes
+ripmon3$trialtype.food<-as.numeric(ripmon3$trialtype==levels(ripmon3$trialtype)[2])
+ripmon3$sex.m<-as.numeric(ripmon3$sex==levels(ripmon3$sex)[2])
+ripmon3$phase.transfer=as.numeric(ripmon3$phase==levels(ripmon3$phase)[2])
+
+#centering the slopes: p-values of the factors can be influenced by the choice of reference category.
+#by centering the factor for the random slope components the p-values should be the same irrespective of the choice of the reference level
+ripmon3$trialtype.food.c<-ripmon3$trialtype.food-mean(ripmon3$trialtype.food)
+ripmon3$phase.transfer.c=ripmon3$phase.transfer-mean(ripmon3$phase.transfer)
+ripmon3$sex.m.c<-ripmon3$sex.m -mean(ripmon3$sex.m)
+
+summary(ripmon3)
+
+```
+
+
+
+
+```{r}
+##To do this I will run a new model for calculating CIs for the interaction model so we can plot the performance in test and transfer across trial numbers separately.
+
+contr<-glmerControl(optimizer="bobyqa", optCtrl=list(maxfun=10000000))
+
+full.CI.int <- glmer(correct ~ trialtype.food.c + z.age + sex.m.c + z.trialno*phase+(1|id)+(0+z.trialno+phase.transfer.c+trialtype.food.c|id), data=ripmon3, family=binomial, control=contr)
+```
+
 
 
 
