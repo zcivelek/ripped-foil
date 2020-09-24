@@ -597,11 +597,13 @@ summary(ripmon4)
 #boot.res.int2$ci.predicted
 
 #save.image("ripped_mon_complete_transferCIs.RData")
-load("ripped_mon_complete_testCIs.RData")
+load("ripped_mon_complete_transferCIs.RData")
 
 
 
 ```
+
+
 ```{r}
 ripmon_separate3 <- ripmon4 %>%
   group_by(trialno) %>% 
