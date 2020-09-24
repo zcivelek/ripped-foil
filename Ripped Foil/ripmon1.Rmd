@@ -470,12 +470,11 @@ summary(test8chance)
 **No, they are at chance level in the first 8 trials of Test phase.**
 
 ```{r}
-#Amanda requested to see how monkeys' performance changed throughout trials of Test and Transfer phase (faceted)- to show visually that performance gets better over time.
+#Amanda requested to see monkeys' performance throughout trials of Test and Transfer phase (faceted)- to show visually that they got many trials in Test phase. Christoph suggested doing 2 separate graphs for Test and Transfer to correct for the earlier CI issue in transfer phase- So I'll do that and then bind the graphs
 
 ###First do all the transformations 
 
-
-ripmon3<-read.csv("ripped_monkey_complete_testtransfer.csv", header=T)
+ripmon3<-read.csv("ripped_monkey_complete_test.csv", header=T)
 str(ripmon3)
 
 ripmon3$id<-as.factor(ripmon3$id)
@@ -494,12 +493,10 @@ ripmon3$trialtype<-relevel(ripmon3$trialtype, ref = "stick")
 #coding dummy variables before centering the slopes
 ripmon3$trialtype.food<-as.numeric(ripmon3$trialtype==levels(ripmon3$trialtype)[2])
 ripmon3$sex.m<-as.numeric(ripmon3$sex==levels(ripmon3$sex)[2])
-ripmon3$sessiontype.transfer=as.numeric(ripmon3$sessiontype==levels(ripmon3$sessiontype)[2])
 
 #centering the slopes: p-values of the factors can be influenced by the choice of reference category.
 #by centering the factor for the random slope components the p-values should be the same irrespective of the choice of the reference level
 ripmon3$trialtype.food.c<-ripmon3$trialtype.food-mean(ripmon3$trialtype.food)
-ripmon3$sessiontype.transfer.c=ripmon3$sessiontype.transfer-mean(ripmon3$sessiontype.transfer)
 ripmon3$sex.m.c<-ripmon3$sex.m -mean(ripmon3$sex.m)
 
 summary(ripmon3)
@@ -512,50 +509,126 @@ summary(ripmon3)
 ```{r}
 ##To do this I will run a new model for calculating CIs for the interaction model so we can plot the performance in test and transfer across trial numbers separately.
 
-contr<-glmerControl(optimizer="bobyqa", optCtrl=list(maxfun=10000000))
+#contr<-glmerControl(optimizer="bobyqa", optCtrl=list(maxfun=10000000))
 
-full.CI.int <- glmer(correct ~ trialtype.food.c + z.age + sex.m.c + z.trialno*sessiontype+ (1|id)+(0+z.trialno+sessiontype.transfer.c+trialtype.food.c|id), data=ripmon3, family=binomial, control=contr)
+#full.CI.int <- glmer(correct ~ trialtype.food.c + z.age + sex.m.c + z.trialno+ (1|id)+(0+z.trialno+trialtype.food.c|id), data=ripmon3, family=binomial, control=contr)
 
-boot.res.int=boot.glmm.pred(model.res=full.CI.int, excl.warnings=T, nboots=5, resol=80, level=0.95, use="z.trialno", n.cores="all-1", para=T)
+#boot.res.int=boot.glmm.pred(model.res=full.CI.int, excl.warnings=T, nboots=1000, resol=80, level=0.95, use="z.trialno", n.cores="all-1", para=T)
 
-boot.res.int$ci.estimates
-boot.res.int$ci.predicted
+#boot.res.int$ci.estimates
+#boot.res.int$ci.predicted
 
-
+#save.image("ripped_mon_complete_testCIs.RData")
+load("ripped_mon_complete_testCIs.RData")
 
 ```
 
 ```{r}
 ripmon_separate2 <- ripmon3 %>%
-  group_by(trialno, sessiontype) %>% 
+  group_by(trialno) %>% 
   summarize(correct= mean(correct))%>%
   ungroup()%>%
-  group_by(trialno, sessiontype)%>%
+  group_by(trialno)%>%
     add_count(correct)
 
 plot.int=seq(from=min(ripmon_separate2$trialno),
              to=max(ripmon_separate2$trialno),length.out=80)
 
 ci.data<-boot.res.int$ci.predicted #I reduced the number of values for the confidence intervals. did not match the actual data.
-toDelete<- seq(1, nrow(ci.data),2)
-ci.data<-ci.data[toDelete,]
+
 
 scatter.int2 <- ggplot(ci.data, aes(y = fitted)) +
   geom_point(data=ripmon_separate2, aes(x = trialno, y = correct), size = ripmon_separate2$n, alpha = 0.8) +
-  facet_wrap(~sessiontype) +
-  geom_ribbon(data = ci.data%>%filter(sessiontype=="test"), aes(x = plot.int, y = fitted, ymin = lower.cl, ymax = upper.cl, group = sessiontype), fill = "grey", alpha = 0.5) +
-  geom_line(data = ci.data%>%filter(sessiontype=="test"), aes(x = plot.int, y = fitted), lty = 2) +
-    geom_ribbon(data = ci.data%>%filter(sessiontype=="transfer"), aes(x = plot.int, y = fitted, ymin = lower.cl, ymax = upper.cl, group = sessiontype), fill = "grey", alpha = 0.5) +
-  geom_line(data = ci.data%>%filter(sessiontype=="transfer"), aes(x = plot.int, y = fitted), lty = 2) + scale_x_continuous(breaks = seq(from = 1, to = 80, by = 8)) +
+  geom_ribbon(data = ci.data, aes(x = plot.int, y = fitted, ymin = lower.cl, ymax = upper.cl), fill = "grey", alpha = 0.5) +
+  geom_line(data = ci.data, aes(x = plot.int, y = fitted), lty = 2)+ scale_x_continuous(breaks = c(1,8,16,24,32,40,48,56,64,72,80)) +
   theme_bw() +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
-  xlab("Trial number") +
-  ylab("Mean correct responses") +
+  xlab("Number of trials in Test") +
+  ylab("Correct response") +
   ylim(0, 1) +
   geom_hline(yintercept = 0.50, color = "red", linetype = "dashed")
 
 scatter.int2
 ```
 
+```{r}
+#Amanda requested to see monkeys' performance throughout trials of Test and Transfer phase (faceted)- to show visually that they got many trials in Test phase. Christoph suggested doing 2 separate graphs for Test and Transfer to correct for the earlier CI issue in transfer phase- So I'll do that and then bind the graphs
+
+###First do all the transformations 
+
+ripmon4<-read.csv("ripped_monkey_complete_transfer.csv", header=T)
+str(ripmon4)
+
+ripmon4$id<-as.factor(ripmon4$id)
+ripmon4$sex<-as.factor(ripmon4$sex)
+ripmon4$sessiontype<-as.factor(ripmon4$sessiontype)
+
+ripmon4$trialtype<-as.factor(ripmon4$trialtype)
 
 
+#We scale variables so that the differences in the range of the variables do not influence the parameter estimations.
+ripmon4$z.trialno<-as.vector(scale(ripmon4$trialno))
+ripmon4$trialtype<-relevel(ripmon4$trialtype, ref = "stick")
+ripmon4$z.age=as.vector(scale(ripmon4$age))
+
+#coding dummy variables before centering the slopes
+ripmon4$trialtype.food<-as.numeric(ripmon4$trialtype==levels(ripmon4$trialtype)[2])
+ripmon4$sex.m<-as.numeric(ripmon4$sex==levels(ripmon4$sex)[2])
+
+#centering the slopes: p-values of the factors can be influenced by the choice of reference category.
+#by centering the factor for the random slope components the p-values should be the same irrespective of the choice of the reference level
+ripmon4$trialtype.food.c<-ripmon4$trialtype.food-mean(ripmon4$trialtype.food)
+ripmon4$sex.m.c<-ripmon4$sex.m -mean(ripmon4$sex.m)
+
+summary(ripmon4)
+
+```
+
+```{r}
+##To do this I will run a new model for calculating CIs for the interaction model so we can plot the performance in test and transfer across trial numbers separately.
+
+#contr<-glmerControl(optimizer="bobyqa", optCtrl=list(maxfun=10000000))
+
+#full.CI.int2 <- glmer(correct ~ trialtype.food.c + z.age + sex.m.c + z.trialno+ (1|id)+(0+z.trialno+trialtype.food.c|id), data=ripmon4, family=binomial, control=contr)
+
+#boot.res.int2=boot.glmm.pred(model.res=full.CI.int2, excl.warnings=T, nboots=1000, resol=16, level=0.95, use="z.trialno", n.cores="all-1", para=T)
+
+#boot.res.int2$ci.estimates
+#boot.res.int2$ci.predicted
+
+#save.image("ripped_mon_complete_transferCIs.RData")
+load("ripped_mon_complete_testCIs.RData")
+
+
+
+```
+```{r}
+ripmon_separate3 <- ripmon4 %>%
+  group_by(trialno) %>% 
+  summarize(correct= mean(correct))%>%
+  ungroup()%>%
+  group_by(trialno)%>%
+    add_count(correct)
+
+plot.int2=seq(from=min(ripmon_separate3$trialno),
+             to=max(ripmon_separate3$trialno),length.out=16)
+
+ci.data2<-boot.res.int2$ci.predicted #I reduced the number of values for the confidence intervals. did not match the actual data.
+
+
+scatter.int3 <- ggplot(ci.data2, aes(y = fitted)) +
+  geom_point(data=ripmon_separate3, aes(x = trialno, y = correct), size = ripmon_separate3$n, alpha = 0.8) +
+  geom_ribbon(data = ci.data2, aes(x = plot.int2, y = fitted, ymin = lower.cl, ymax = upper.cl), fill = "grey", alpha = 0.5) +
+  geom_line(data = ci.data2, aes(x = plot.int2, y = fitted), lty = 2)+ scale_x_continuous(breaks =c(1,8,16)) +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  xlab("Number of trials in Transfer") +
+  ylab("Correct response") +
+  ylim(0, 1) +
+  geom_hline(yintercept = 0.50, color = "red", linetype = "dashed")
+
+scatter.int3
+
+ggarrange(scatter.int2, scatter.int3, widths= c(7,7), heights = c(10, 10),
+          ncol = 2, nrow = 1)
+```
