@@ -1,0 +1,210 @@
+---
+title: "Patterned Paper Control - Monkeys"
+author: "Zeynep Civelek"
+date: "June 30, 2020"
+output: word_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, warning=FALSE, message=FALSE, include=TRUE)
+
+#This sets general options for the code chunks in the R Markdown file. The echo, warning, and message = FALSE hide the code chunks, warning messages, and other messages, where the ‘include=true’ will make all figures appear in the text. You can set some of these variables to TRUE, and hit Knit to see what they change. 
+```
+
+```{r, include=FALSE}
+#PREPARE
+R.Version()#for referencing, shows you which R version you are using
+rm(list=ls())#removes any other items in your workspace
+ls()#check whether workspace is empty
+```
+
+```{r, include=FALSE}
+#Directory is set, data is added and all the libraries necessary for running the analyses are loaded.
+conmon3<-read.csv("conmon_complete_test.csv", header=T)
+str(conmon3)
+
+#all the libraries necessary to run the analyses
+library(lme4)
+library(readr)
+library(tidyverse)
+library(sjPlot)
+#install.packages('TMB', type='source')
+library(ggthemes)
+library(gridExtra)
+library(reshape2)
+library(car)
+#library(psych)
+library("ggpubr")
+library(dplyr)
+
+```
+
+
+```{r, echo=FALSE}
+source("./Roger_functions/diagnostic_fcns.r")
+source("./Roger_functions/glmm_stability.r")
+source("./Roger_functions/boot_glmm.r")
+```
+
+
+```{r}
+#Amanda requested to see monkeys' performance throughout trials of Test and Transfer phase (faceted)- to show visually that they got many trials in Test phase. Christoph suggested doing 2 separate graphs for Test and Transfer to correct for the earlier CI issue in transfer phase- So I'll do that and then bind the graphs
+
+###First do all the transformations 
+
+conmon3$id<-as.factor(conmon3$id)
+conmon3$sex<-as.factor(conmon3$sex)
+conmon3$phase<-as.factor(conmon3$phase)
+
+conmon3$trialtype<-as.factor(conmon3$trialtype)
+
+
+#We scale variables so that the differences in the range of the variables do not influence the parameter estimations.
+conmon3$z.trialno<-as.vector(scale(conmon3$trialno))
+conmon3$z.age=as.vector(scale(conmon3$age))
+conmon3$trialtype<-relevel(conmon3$trialtype, ref = "stick")
+
+#coding dummy variables before centering the slopes
+conmon3$trialtype.food<-as.numeric(conmon3$trialtype==levels(conmon3$trialtype)[2])
+conmon3$sex.m<-as.numeric(conmon3$sex==levels(conmon3$sex)[2])
+
+#centering the slopes: p-values of the factors can be influenced by the choice of reference category.
+#by centering the factor for the random slope components the p-values should be the same irrespective of the choice of the reference level
+conmon3$trialtype.food.c<-conmon3$trialtype.food-mean(conmon3$trialtype.food)
+conmon3$sex.m.c<-conmon3$sex.m -mean(conmon3$sex.m)
+
+summary(conmon3)
+
+```
+
+
+
+
+```{r}
+##To do this I will run a new model for calculating CIs for the interaction model so we can plot the performance in test and transfer across trial numbers separately.
+
+#contr<-glmerControl(optimizer="bobyqa", optCtrl=list(maxfun=10000000))
+
+#full.CI.contest <- glmer(correct ~ trialtype.food.c + z.age + sex.m.c + z.trialno+ (1|id)+(0+z.trialno+trialtype.food.c|id), data=conmon3, family=binomial, control=contr)
+
+
+#boot.res.contest=boot.glmm.pred(model.res=full.CI.contest, excl.warnings=T, nboots=1000, resol=80, level=0.95, use="z.trialno", n.cores="all-1", para=T)
+
+#boot.res.contest$ci.estimates
+#boot.res.contest$ci.predicted
+
+#save.image("pattern_con_complete_testCIs.RData")
+load("pattern_con_complete_testCIs.RData")
+
+```
+
+```{r}
+conmon_separate <- conmon3 %>%
+  group_by(trialno) %>% 
+  summarize(correct= mean(correct))%>%
+  ungroup()%>%
+  group_by(trialno)%>%
+    add_count(correct)
+
+plot.contest=seq(from=min(conmon_separate$trialno),
+             to=max(conmon_separate$trialno),length.out=80)
+
+ci.data<-boot.res.contest$ci.predicted 
+
+
+scatter.contest <- ggplot(ci.data, aes(y = fitted)) +
+  geom_point(data=conmon_separate, aes(x = trialno, y = correct), size = conmon_separate$n, alpha = 0.8) +
+  geom_ribbon(data = ci.data, aes(x = plot.contest, y = fitted, ymin = lower.cl, ymax = upper.cl), fill = "grey", alpha = 0.5) +
+  geom_line(data = ci.data, aes(x = plot.contest, y = fitted), lty = 2)+ scale_x_continuous(breaks = c(1,8,16,24,32,40,48,56,64,72,80)) +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  xlab("Number of trials in Test") +
+  ylab("Correct response") +
+  ylim(0, 1) +
+  geom_hline(yintercept = 0.50, color = "red", linetype = "dashed")
+
+scatter.contest
+```
+
+```{r}
+#Amanda requested to see monkeys' performance throughout trials of Test and Transfer phase (faceted)- to show visually that they got many trials in Test phase. Christoph suggested doing 2 separate graphs for Test and Transfer to correct for the earlier CI issue in transfer phase- So I'll do that and then bind the graphs
+
+###First do all the transformations 
+
+conmon4<-read.csv("conmon_complete_transfer.csv", header=T)
+str(conmon4)
+
+conmon4$id<-as.factor(conmon4$id)
+conmon4$sex<-as.factor(conmon4$sex)
+conmon4$sessiontype<-as.factor(conmon4$sessiontype)
+
+conmon4$trialtype<-as.factor(conmon4$trialtype)
+
+
+#We scale variables so that the differences in the range of the variables do not influence the parameter estimations.
+conmon4$z.trialno<-as.vector(scale(conmon4$trialno))
+conmon4$trialtype<-relevel(conmon4$trialtype, ref = "stick")
+conmon4$z.age=as.vector(scale(conmon4$age))
+
+#coding dummy variables before centering the slopes
+conmon4$trialtype.food<-as.numeric(conmon4$trialtype==levels(conmon4$trialtype)[2])
+conmon4$sex.m<-as.numeric(conmon4$sex==levels(conmon4$sex)[2])
+
+#centering the slopes: p-values of the factors can be influenced by the choice of reference category.
+#by centering the factor for the random slope components the p-values should be the same irrespective of the choice of the reference level
+conmon4$trialtype.food.c<-conmon4$trialtype.food-mean(conmon4$trialtype.food)
+conmon4$sex.m.c<-conmon4$sex.m -mean(conmon4$sex.m)
+
+summary(conmon4)
+
+```
+
+```{r}
+##To do this I will run a new model for calculating CIs for the interaction model so we can plot the performance in test and transfer across trial numbers separately.
+
+#contr<-glmerControl(optimizer="bobyqa", optCtrl=list(maxfun=10000000))
+
+#full.CI.contransfer <- glmer(correct ~ trialtype.food.c + z.age + sex.m.c + z.trialno+ (1|id)+(0+z.trialno+trialtype.food.c|id), data=conmon4, family=binomial, control=contr)
+
+#boot.res.contransfer=boot.glmm.pred(model.res=full.CI.contransfer, excl.warnings=T, nboots=1000, resol=16, level=0.95, use="z.trialno", n.cores="all-1", para=T)
+
+#boot.res.contransfer$ci.estimates
+#boot.res.contransfer$ci.predicted
+
+#save.image("pattern_con_complete_transferCIs.RData")
+load("pattern_con_complete_transferCIs.RData")
+
+
+```
+
+
+
+```{r}
+conmon_separate2 <- conmon4 %>%
+  group_by(trialno) %>% 
+  summarize(correct= mean(correct))%>%
+  ungroup()%>%
+  group_by(trialno)%>%
+    add_count(correct)
+
+plot.contransfer=seq(from=min(conmon_separate2$trialno),
+             to=max(conmon_separate2$trialno),length.out=16)
+
+ci.data.transfer<-boot.res.contransfer$ci.predicted 
+
+
+scatter.contransfer <- ggplot(ci.data.transfer, aes(y = fitted)) +
+  geom_point(data=conmon_separate2, aes(x = trialno, y = correct), size = conmon_separate2$n, alpha = 0.8) +
+  geom_ribbon(data = ci.data.transfer, aes(x = plot.contransfer, y = fitted, ymin = lower.cl, ymax = upper.cl), fill = "grey", alpha = 0.5) +
+  geom_line(data = ci.data.transfer, aes(x = plot.contransfer, y = fitted), lty = 2)+ scale_x_continuous(breaks =c(1,8,16)) +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  xlab("Number of trials in Transfer") +
+  ylab("Correct response") +
+  ylim(0, 1) +
+  geom_hline(yintercept = 0.50, color = "red", linetype = "dashed")
+
+scatter.contransfer
+
+ggarrange(scatter.contest, scatter.contransfer, widths= c(7,7), heights = c(10, 10),
+          ncol = 2, nrow = 1)
+```
