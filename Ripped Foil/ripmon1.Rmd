@@ -634,3 +634,55 @@ scatter.int3
 ggarrange(scatter.int2, scatter.int3, widths= c(7,7), heights = c(10, 10),
           ncol = 2, nrow = 1)
 ```
+
+
+```{r}
+##Christoph said looking at these graphs: "also one can see that the glmm is not really good at fitting data like in the transfer phase. it does not capture at all the rapid improvement between the first and second trial. it is more suited for more gradual changes in performance. I'd be curious how the results would look like if you included (z.trial + I(z.trial^2)) instead of z.trial in the transfer model.  I'm not saying that we should use it for the paper but it would be interesting to see how the model would fit the data with the polynomial included
+
+contr<-glmerControl(optimizer="bobyqa", optCtrl=list(maxfun=10000000))
+
+full.CI.transfer <- glmer(correct ~ trialtype.food.c + z.age + sex.m.c + z.trialno + I(z.trialno^2)+ (1|id)+(0+z.trialno+ I(z.trialno^2)+trialtype.food.c|id), data=ripmon4, family=binomial, control=contr)
+
+boot.res.transfer=boot.glmm.pred(model.res=full.CI.transfer, excl.warnings=T, nboots=10, resol=16, level=0.95, use="z.trialno+I(z.trialno^2)", n.cores="all-1", para=T)
+
+boot.res.transfer$ci.estimates
+boot.res.transfer$ci.predicted
+
+#save.image("ripped_mon_complete_transferCIs.RData")
+load("ripped_mon_complete_transferCIs.RData")
+
+
+
+```
+
+```{r}
+ripmon_separate4 <- ripmon4 %>%
+  group_by(trialno) %>% 
+  summarize(correct= mean(correct))%>%
+  ungroup()%>%
+  group_by(trialno)%>%
+    add_count(correct)
+
+plot.transfer=seq(from=min(ripmon_separate4$trialno),
+             to=max(ripmon_separate4$trialno),length.out=16)
+
+ci.data3<-boot.res.transfer$ci.predicted
+
+
+scatter.transfer <- ggplot(ci.data3, aes(y = fitted)) +
+  geom_point(data=ripmon_separate4, aes(x = trialno, y = correct), size = ripmon_separate4$n, alpha = 0.8) +
+  geom_ribbon(data = ci.data3, aes(x = plot.transfer, y = fitted, ymin = lower.cl, ymax = upper.cl), fill = "grey", alpha = 0.5) +
+  geom_line(data = ci.data3, aes(x = plot.transfer, y = fitted), lty = 2)+ scale_x_continuous(breaks =c(1,8,16)) +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  xlab("Number of trials in Transfer") +
+  ylab("Correct response") +
+  ylim(0, 1) +
+  geom_hline(yintercept = 0.50, color = "red", linetype = "dashed")
+
+scatter.transfer
+
+ggarrange(scatter.int2, scatter.int3, widths= c(7,7), heights = c(10, 10),
+          ncol = 2, nrow = 1)
+```
+
