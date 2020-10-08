@@ -50,6 +50,7 @@ ripchild$order<-as.factor(ripchild$order)
 ripchild$order2<-as.factor(ripchild$order2)
 ripchild$order3<-as.factor(ripchild$order3)
 ripchild$agecat<-as.factor(ripchild$agecat)
+ripchild$openended<-as.factor(ripchild$openended)
 
 str(ripchild)
 summary(ripchild)
@@ -156,11 +157,15 @@ summary(ripchild)
 ripchild$trialtype.sticker<-as.numeric(ripchild$trialtype==levels(ripchild$trialtype)[2])
 ripchild$sex.m<-as.numeric(ripchild$sex==levels(ripchild$sex)[2])
 ripchild$order3.transfer<-as.numeric(ripchild$order3==levels(ripchild$order3)[2])
+ripchild$openended1<-as.numeric(ripchild$openended==levels(ripchild$openended)[2])
+
 
 #Centering the slopes
 ripchild$trialtype.sticker.c<-ripchild$trialtype.sticker-mean(ripchild$trialtype.sticker)
 ripchild$sex.m.c<-ripchild$sex.m -mean(ripchild$sex.m)
 ripchild$order3.transfer.c<-ripchild$order3.transfer-mean(ripchild$order3.transfer)
+ripchild$openended1.c<-ripchild$openended1 -mean(ripchild$openended1)
+
 ```
 
 
@@ -618,8 +623,42 @@ summary(testincorrect)
 ```
 
 
+```{r}
+#instead of the above analyses for open ended questions and age matching, CV suggests running a GLMM for all
+
+fullopen<-glmer(correct ~ openended1.c*z.age+(1|id)+(0+openended1.c|id),data=ripchild, family=binomial, control=contr)
+nullopen<-glmer(correct ~(1|id)+(0+openended1.c|id),data=ripchild, family=binomial, control=contr)
+round(anova(nullopen, fullopen, test="Chisq"),3)
+xdrop1=drop1(fullopen, test="Chisq",control=contr)
+round(xdrop1,3)
+
+```
 
 
+```{r}
+#plotting the age and openended question interaction
+
+
+ripchild_open <- ripchild %>%
+  group_by(id,  agemonths, openended) %>% 
+  summarize(correct= mean(correct))%>%
+  ungroup()%>%
+  group_by(agemonths, openended)%>%
+    add_count(correct)
+
+scatter.int3 <- ggplot(data=ripchild_open, aes(x=agemonths, y=correct, group=openended)) +
+  geom_point(data=ripchild_open, aes(x = agemonths, y = correct), size = ripchild_open$n, alpha = 0.8) +
+  facet_wrap(~openended) + 
+  scale_x_continuous(breaks = seq(from = 36, to = 72, by = 4)) +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  xlab("Age in months") +
+  ylab("Mean correct responses") +
+  ylim(0, 1) +
+  geom_hline(yintercept = 0.50, color = "red", linetype = "dashed")
+
+scatter.int3
+```
 
 
 
