@@ -646,11 +646,10 @@ ripchild_open <- ripchild %>%
   group_by(agemonths, openended)%>%
     add_count(correct)
 
-scatter.int3 <- ggplot(data=ripchild_open, aes(x=agemonths, y=correct, group=openended)) +
-  geom_point(data=ripchild_open, aes(x = agemonths, y = correct), size = ripchild_open$n, alpha = 0.8) +
-  facet_wrap(~openended) + 
+scatter.int3 <- ggplot(data=ripchild_open, aes(x=agemonths, y=correct, colour=openended)) +
+  geom_point(data=ripchild_open, aes(x = agemonths, y = correct, colour=openended)) +
   scale_x_continuous(breaks = seq(from = 36, to = 72, by = 4)) +
-  theme_bw() +
+  theme_bw() + scale_colour_discrete(name="Explanation")+
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   xlab("Age in months") +
   ylab("Mean correct responses") +
