@@ -458,11 +458,11 @@ full.CI.int<-glmer(correct ~ trialtype.sticker.c+z.age*order3+sex.m.c+z.trialno+
 
 
 ```{r include=FALSE}
-boot.res.int=boot.glmm.pred(model.res=full.CI.int, excl.warnings=T, nboots=1000, resol=136, level=0.95, use="z.age", n.cores="all-1", para=T) #resol=136 this time because data is aggregated for test and transfer separately.
-boot.res.int$ci.estimates
-boot.res.int$ci.predicted
+#boot.res.int=boot.glmm.pred(model.res=full.CI.int, excl.warnings=T, nboots=1000, resol=136, level=0.95, use="z.age", n.cores="all-1", para=T) #resol=136 this time because data is aggregated for test and transfer separately.
+#boot.res.int$ci.estimates
+#boot.res.int$ci.predicted
 
-save.image("ripped_foil_child_CIs_interaction.RData")
+#save.image("ripped_foil_child_CIs_interaction.RData")
 load("ripped_foil_child_CIs_interaction.RData")
 ```
 
