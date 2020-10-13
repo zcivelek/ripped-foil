@@ -409,7 +409,7 @@ scatter
 
 ```{r echo=FALSE}
 ripchild_individual <- ripchild %>%
-  group_by(id, age, agemonths) %>% 
+  group_by(id, age, agemonths, openended) %>% 
   summarize(correct = mean(correct))%>%
   ungroup()%>%
   group_by(agemonths)%>%
@@ -458,11 +458,11 @@ full.CI.int<-glmer(correct ~ trialtype.sticker.c+z.age*order3+sex.m.c+z.trialno+
 
 
 ```{r include=FALSE}
-#boot.res.int=boot.glmm.pred(model.res=full.CI.int, excl.warnings=T, nboots=1000, resol=136, level=0.95, use="z.age", n.cores="all-1", para=T) #resol=136 this time because data is aggregated for test and transfer separately.
-#boot.res.int$ci.estimates
-#boot.res.int$ci.predicted
+boot.res.int=boot.glmm.pred(model.res=full.CI.int, excl.warnings=T, nboots=1000, resol=136, level=0.95, use="z.age", n.cores="all-1", para=T) #resol=136 this time because data is aggregated for test and transfer separately.
+boot.res.int$ci.estimates
+boot.res.int$ci.predicted
 
-#save.image("ripped_foil_child_CIs_interaction.RData")
+save.image("ripped_foil_child_CIs_interaction.RData")
 load("ripped_foil_child_CIs_interaction.RData")
 ```
 
@@ -470,7 +470,7 @@ load("ripped_foil_child_CIs_interaction.RData")
 
 ```{r echo=FALSE}
 ripchild_separate <- ripchild %>%
-  group_by(id,  z.age, order3) %>% 
+  group_by(id,  z.age, order3, openended) %>% 
   summarize(correct= mean(correct))%>%
   ungroup()%>%
   group_by(z.age, order3)%>%
@@ -493,7 +493,7 @@ scatter.int
 ```{r echo=TRUE}
 #do the same scatter plot for interaction with age not z-tranformed so the graph is more informative.
 ripchild_separate2 <- ripchild %>%
-  group_by(id,  agemonths, order3) %>% 
+  group_by(id,  agemonths, order3, openended) %>% 
   summarize(correct= mean(correct))%>%
   ungroup()%>%
   group_by(agemonths, order3)%>%
@@ -521,6 +521,30 @@ scatter.int2 <- ggplot(ci.data, aes(y = fitted)) +
   geom_hline(yintercept = 0.50, color = "red", linetype = "dashed")
 
 scatter.int2
+```
+
+```{r}
+##trying to put explanation into the phase*age interaction graph.
+
+ci.data<-boot.res.int$ci.predicted #I reduced the number of values for the confidence intervals. did not match the actual data.
+toDelete<- seq(1, nrow(ci.data),2)
+ci.data<-ci.data[toDelete,]
+
+scatter.int3 <- ggplot(data=ripchild_separate2, aes(x= ci.data$z.age, y = ci.data$fitted)) +
+  geom_point(data=ripchild_separate2, aes(x = agemonths, y = correct, shape=openended), size = ripchild_separate2$n, alpha = 0.8) +
+  facet_wrap(~order3) + geom_segment(data=data.frame(order3="transfer"), mapping=aes(x=44, xend=44, y=0, yend=0.5, order3="transfer"), arrow=arrow(length=unit(0.2,"cm")))+ geom_segment(data=data.frame(order3="test"), mapping=aes(x=40, xend=40, y=0, yend=0.5, order3="test"), arrow=arrow(length=unit(0.2,"cm"))) +
+  geom_ribbon(data = ci.data%>%filter(order3=="test"), aes(x = plot.int, y = fitted, ymin = lower.cl, ymax = upper.cl, group = order3), fill = "grey", alpha = 0.5) +
+  geom_line(data = ci.data%>%filter(order3=="test"), aes(x = plot.int, y = fitted), lty = 2) +
+    geom_ribbon(data = ci.data%>%filter(order3=="transfer"), aes(x = plot.int, y = fitted, ymin = lower.cl, ymax = upper.cl, group = order3), fill = "grey", alpha = 0.5) +
+  geom_line(data = ci.data%>%filter(order3=="transfer"), aes(x = plot.int, y = fitted), lty = 2) + scale_shape_manual(name="Explanation", values = c(19,21))+ scale_x_continuous(breaks = seq(from = 36, to = 72, by = 8))+
+  theme_bw() + 
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  xlab("Age in months") +
+  ylab("Mean correct responses") +
+  ylim(0, 1) +
+  geom_hline(yintercept = 0.50, color = "red", linetype = "dashed")
+
+scatter.int3
 ```
 
 **Younger children's (up until 50 months of age) scores in both test and transfer do not seem to differ from chance level compared to older children. The slope for the Transfer phase is also steeper than in Test level  meaning that the difference between the younger and older children's performance in Transfer is larger.**
