@@ -421,12 +421,12 @@ plot.xvals=seq(from=min(ripchild_individual$agemonths),to=max(ripchild_individua
 scatter<-ggplot(ripchild_individual, aes(x=plot.xvals, y=boot.res$ci.predicted$fitted)) + geom_point(aes(x=agemonths, y=correct), size=ripchild_individual$n, alpha=0.8)+
 geom_ribbon(data=boot.res$ci.predicted, aes(x=plot.xvals, ymin=boot.res$ci.predicted$lower.cl,ymax=boot.res$ci.predicted$upper.cl), fill="grey", alpha=0.5)+
 geom_line(data=boot.res$ci.predicted, aes(x = plot.xvals, y=boot.res$ci.predicted$fitted), lty=2)+ scale_x_continuous(breaks = seq(from = 36, to = 72, by = 6)) +  geom_segment(aes(x = 42, y = 0, xend = 42, yend = 0.5), arrow=arrow(length = unit(0.2, "cm")), colour="red")+
-theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ xlab("Age in months")+ ylab("Mean correct responses")+ 
+theme_bw(base_size = 12) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ xlab("Age in months")+ ylab("Mean correct responses")+ 
   ylim(0,1)+
   geom_hline(yintercept=0.50, color='red', linetype="dashed")
 
 scatter
-ggsave("overall performance across age.png")
+ggsave("overall performance across age.png", width = 10, height = 5, scale=0.7)
 ```
 
 **Performance of younger children (up until 50 months of age) seem to be at or below chance level in this task. Older children seem to be doing better although there is a lot of variation (some are performing at ceiling level while some others are below chance).**
@@ -536,7 +536,7 @@ scatter.int3 <- ggplot(data=ripchild_separate2, aes(x= ci.data$z.age, y = ci.dat
   geom_line(data = ci.data%>%filter(order3=="test"), aes(x = plot.int, y = fitted), lty = 2) +
     geom_ribbon(data = ci.data%>%filter(order3=="transfer"), aes(x = plot.int, y = fitted, ymin = lower.cl, ymax = upper.cl, group = order3), fill = "grey", alpha = 0.5) +
   geom_line(data = ci.data%>%filter(order3=="transfer"), aes(x = plot.int, y = fitted), lty = 2) + scale_shape_manual(name="Explanation", values = c(19,21))+ scale_x_continuous(breaks = seq(from = 36, to = 72, by = 8))+
-  theme_bw() + 
+  theme_bw(base_size = 12) + 
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   xlab("Age in months") +
   ylab("Mean correct responses") +
@@ -544,7 +544,7 @@ scatter.int3 <- ggplot(data=ripchild_separate2, aes(x= ci.data$z.age, y = ci.dat
   geom_hline(yintercept = 0.50, color = "red", linetype = "dashed")
 
 scatter.int3
-ggsave("performance in test and transfer across age w explanation.png")
+ggsave("performance in test and transfer across age w explanation.png",width = 10, height = 5, scale=0.7)
 ```
 
 **Younger children's (up until 50 months of age) scores in both test and transfer do not seem to differ from chance level compared to older children. The slope for the Transfer phase is also steeper than in Test level  meaning that the difference between the younger and older children's performance in Transfer is larger.**
@@ -586,8 +586,8 @@ We can plot this as:
 ```{r echo=FALSE}
 #how about ggplot
 ggplot(ripchild_1st_trial, aes(x=agemonths, y=correct)) + geom_point() + 
-  stat_smooth(method="glm", fullrange = TRUE, lty=2, size=0.5, colour="Black", alpha=0.2,  method.args=list(family="binomial")) + scale_x_continuous(breaks = seq(from = 36, to = 72, by = 2)) +  scale_y_continuous(breaks = seq(0, 1, by = 1)) +geom_segment(aes(x = 50, y = 0, xend = 50, yend = 0.5), arrow=arrow(length = unit(0.2, "cm")), colour="red")+ylab("First trial performance of Transfer Phase")+xlab("Age in months")+theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + geom_hline(yintercept=0.50, color='red', linetype="dashed")
-ggsave("first trial in transfer.png")
+  stat_smooth(method="glm", fullrange = TRUE, lty=2, size=0.5, colour="Black", alpha=0.2,  method.args=list(family="binomial")) + scale_x_continuous(breaks = seq(from = 36, to = 72, by = 2)) +  scale_y_continuous(breaks = seq(0, 1, by = 1)) +geom_segment(aes(x = 50, y = 0, xend = 50, yend = 0.5), arrow=arrow(length = unit(0.2, "cm")), colour="red")+ylab("First trial performance of Transfer Phase")+xlab("Age in months")+theme_bw(base_size = 12) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + geom_hline(yintercept=0.50, color='red', linetype="dashed")
+ggsave("first trial in transfer.png", width = 10, height = 5, scale=0.7)
 ```
 
 **Younger children tend to make more errors than older children**
