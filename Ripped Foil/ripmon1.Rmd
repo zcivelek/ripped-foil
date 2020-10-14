@@ -541,7 +541,7 @@ scatter.int2 <- ggplot(ci.data, aes(y = fitted)) +
   geom_point(data=ripmon_separate2, aes(x = trialno, y = correct), size = ripmon_separate2$n, alpha = 0.8) +
   geom_ribbon(data = ci.data, aes(x = plot.int, y = fitted, ymin = lower.cl, ymax = upper.cl), fill = "grey", alpha = 0.5) +
   geom_line(data = ci.data, aes(x = plot.int, y = fitted), lty = 2)+ scale_x_continuous(breaks = c(1,8,16,24,32,40,48,56,64,72,80)) +
-  theme_bw() +
+  theme_bw(base_size = 16) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   xlab("Number of trials in Test") +
   ylab("Correct response") +
@@ -622,7 +622,7 @@ scatter.int3 <- ggplot(ci.data2, aes(y = fitted)) +
   geom_point(data=ripmon_separate3, aes(x = trialno, y = correct), size = ripmon_separate3$n, alpha = 0.8) +
   geom_ribbon(data = ci.data2, aes(x = plot.int2, y = fitted, ymin = lower.cl, ymax = upper.cl), fill = "grey", alpha = 0.5) +
   geom_line(data = ci.data2, aes(x = plot.int2, y = fitted), lty = 2)+ scale_x_continuous(breaks =c(1,8,16)) +
-  theme_bw() +
+  theme_bw(base_size = 16) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   xlab("Number of trials in Transfer") +
   ylab("Correct response") +
@@ -633,7 +633,11 @@ scatter.int3
 
 ggarrange(scatter.int2, scatter.int3, widths= c(7,7), heights = c(10, 10),
           ncol = 2, nrow = 1)
-ggsave("test transfer across trials exp 2.png")
+
+
+
+ggsave("test transfer across trials exp 2.png", width = 10, height = 5, scale=0.7)
+
 ```
 
 
