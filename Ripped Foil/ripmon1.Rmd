@@ -21,7 +21,7 @@ ls()#check whether workspace is empty
 #Directory is set, data is added and all the libraries necessary for running the analyses are loaded.
 
 ripmon1<-read.csv("ripped_monkey_test16.csv", header=T)
-setwd("C:/Users/zeyne/OneDrive/Desktop/ripped-foil/Ripped Foil")
+#setwd("C:/Users/zeyne/OneDrive/Desktop/ripped-foil/Ripped Foil")
 # ripchild<-read.csv("ripped_child.csv", header=T)
 #all the libraries necessary to run the analyses
 library(lme4)
@@ -633,6 +633,7 @@ scatter.int3
 
 ggarrange(scatter.int2, scatter.int3, widths= c(7,7), heights = c(10, 10),
           ncol = 2, nrow = 1)
+ggsave("test transfer across trials exp 2.png")
 ```
 
 

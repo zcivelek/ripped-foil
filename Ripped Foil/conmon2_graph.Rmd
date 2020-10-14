@@ -207,4 +207,5 @@ scatter.contransfer
 
 ggarrange(scatter.contest, scatter.contransfer, widths= c(7,7), heights = c(10, 10),
           ncol = 2, nrow = 1)
+ggsave("test transfer across trials exp 3.png")
 ```
