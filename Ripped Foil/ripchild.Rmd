@@ -530,12 +530,12 @@ toDelete<- seq(1, nrow(ci.data),2)
 ci.data<-ci.data[toDelete,]
 
 scatter.int3 <- ggplot(data=ripchild_separate2, aes(x= ci.data$z.age, y = ci.data$fitted)) +
-  geom_point(data=ripchild_separate2, aes(x = agemonths, y = correct, shape=openended), size = ripchild_separate2$n, alpha = 0.8) +
+  geom_point(data=ripchild_separate2, aes(x = agemonths, y = correct, color=openended), size = ripchild_separate2$n, alpha = 0.8) +
   facet_wrap(~order3) + geom_segment(data=data.frame(order3="transfer"), mapping=aes(x=44, xend=44, y=0, yend=0.5, order3="transfer"), arrow=arrow(length=unit(0.2,"cm")))+ geom_segment(data=data.frame(order3="test"), mapping=aes(x=40, xend=40, y=0, yend=0.5, order3="test"), arrow=arrow(length=unit(0.2,"cm"))) +
   geom_ribbon(data = ci.data%>%filter(order3=="test"), aes(x = plot.int, y = fitted, ymin = lower.cl, ymax = upper.cl, group = order3), fill = "grey", alpha = 0.5) +
   geom_line(data = ci.data%>%filter(order3=="test"), aes(x = plot.int, y = fitted), lty = 2) +
     geom_ribbon(data = ci.data%>%filter(order3=="transfer"), aes(x = plot.int, y = fitted, ymin = lower.cl, ymax = upper.cl, group = order3), fill = "grey", alpha = 0.5) +
-  geom_line(data = ci.data%>%filter(order3=="transfer"), aes(x = plot.int, y = fitted), lty = 2) + scale_shape_manual(name="Explanation", values = c(19,21))+ scale_x_continuous(breaks = seq(from = 36, to = 72, by = 8))+
+  geom_line(data = ci.data%>%filter(order3=="transfer"), aes(x = plot.int, y = fitted), lty = 2) + scale_colour_manual(name="explanation", values = c("Red", "Black"), labels=c("correct", "wrong")) + scale_x_continuous(breaks = seq(from = 36, to = 72, by = 8)) +
   theme_bw(base_size = 12) + 
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   xlab("Age in months") +
