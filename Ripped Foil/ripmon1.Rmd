@@ -401,18 +401,23 @@ p + geom_bar(stat = "identity", position = position_dodge(0.9), width = 0.8) + g
 ```{r, echo=TRUE}
 testphase <-ripmon1%>%
   filter(phase == "test")
-testchance <- glmer(correct ~ 1 + (z.trialno | id),data= testphase, family=binomial)
+testchance <- glmer(correct ~ 1 + (z.trialno | id), data= testphase, family=binomial)
 summary(testchance)
 confint(object=testchance)
 ```
 
 **The intercept is significant: Performance in Test phase is above chance level.**
 
+
 ```{r, echo=TRUE}
 transferphase <-ripmon1%>%
   filter(phase == "transfer")
 transferchance <- glmer(correct ~ 1 + (z.trialno | id),data= transferphase, family=binomial)
 summary(transferchance)
+```
+
+
+```{r, echo=TRUE}
 ```
 
 **Performanc in Transfer phase is above chance level as well. And there is no significant difference between the monkeys' performances in Test and Transfer phases.**
@@ -689,5 +694,117 @@ scatter.transfer
 
 ggarrange(scatter.int2, scatter.int3, widths= c(7,7), heights = c(10, 10),
           ncol = 2, nrow = 1)
+```
+
+####post-review####
+
+```{r}
+#R3 asked if the monkeys who reached the criterion in the Test phase (Reuben, Chico, Carlos and Diego) outperformed those who did not reach the criterion in the Transfer phase
+
+transfer<-read.csv("ripped_monkey_complete_transfer.csv", header=T)
+str(transfer)
+transfer$id<-as.factor(transfer$id)
+transfer$passedtest<-as.factor(transfer$passedtest)
+transfer$trialtype<-as.factor(transfer$trialtype)
+
+#We scale variables so that the differences in the range of the variables do not influence the parameter estimations.
+transfer$z.trialno<-as.vector(scale(transfer$trialno))
+transfer$trialtype<-relevel(transfer$trialtype, ref = "stick")
+transfer$passedtest<- relevel(transfer$passedtest, ref ="1")
+
+#coding dummy variables before centering the slopes
+transfer$passedtest.no<-as.numeric(transfer$passedtest==levels(transfer$passedtest)[2])
+transfer$trialtype.food<-as.numeric(transfer$trialtype==levels(transfer$trialtype)[2])
+
+#centering the slopes: p-values of the factors can be influenced by the choice of reference category.
+#by centering the factor for the random slope components the p-values should be the same irrespective of the choice of the reference level
+transfer$passedtest.no.c<-transfer$passedtest.no-mean(transfer$passedtest.no)
+transfer$trialtype.food.c<-transfer$trialtype.food-mean(transfer$trialtype.food)
+
+summary(transfer)
+
+contr<-glmerControl(optimizer="bobyqa", optCtrl=list(maxfun=10000000))
+full_R3=glmer(correct ~ passedtest+ trialtype+z.trialno+(1|id)+(0+z.trialno+trialtype.food.c+passedtest.no.c|id),data=transfer, family=binomial,control=contr)
+null_R3=glmer(correct~z.trialno+(1|id)+(0+z.trialno+trialtype.food.c+passedtest.no.c|id),data=transfer, family=binomial, control=contr)
+round(anova(null_R3, full_R3, test="Chisq"),3)
+round(summary(full_R3)$coefficients, 3)
+
+xdrop1=drop1(full_R3, test="Chisq",control=contr)
+round(xdrop1,3)
+
+###There is no difference in the Transfer performance of those who reached the criterion and who did not in Test.
+```
+
+```{r}
+#So there is no difference between those who passed the Test and who did not (wrt their Transfer performance). How about their performance against chance level in Transfer?
+passed_inTransfer <-transfer%>%
+  filter(passedtest == "1")
+passed_chance <- glmer(correct ~ 1 + (z.trialno | id),data= passed_inTransfer, family=binomial)
+summary(passed_chance)
+##They are significantly above chance.
+```
+
+```{r}
+#How about those who did not pass the Test#
+notpassed_inTransfer <-transfer%>%
+  filter(passedtest == "0")
+notpassed_chance <- glmer(correct ~ 1 + (z.trialno | id), data= notpassed_inTransfer, family=binomial)
+summary(notpassed_chance)
+#Those who did not reach the criterion in Test phase are also significantly above chance in the Transfer phase.
+```
+
+##Correcting the p-values for the post-hoc tests using Hochberg correction (in the order: passed, notpassed)
+
+```{r, echo=TRUE}
+pvalues <- c(0.014, 2.8e-06)
+p.adjust(pvalues, method="hochberg")
+```
+
+```{r}
+#R3 says "To complement performance assessment of all trials for the whole group, the authors might also want to report how many of the 15 individuals who never reached the numerical 14 of 16 criterion performed above chance when all their trials were considered."
+testcomplete<-read.csv("ripped_monkey_complete_test.csv", header=T)
+#Just include those who did not reach the criterion (N=15) and see if they performed above chance in overall Test.
+
+str(testcomplete)
+testcomplete$id<-as.factor(testcomplete$id)
+testcomplete$passedtest<-as.factor(testcomplete$passedtest)
+testcomplete$z.trialno<-as.vector(scale(testcomplete$trialno))
+
+notpassed_Test <-testcomplete%>%
+  filter(passedtest == "0")
+notpassed_chance <- glmer(correct ~ 1 + (z.trialno | id), data=notpassed_Test, family=binomial)
+summary(notpassed_chance)
+
+#It seems those who did not reach the criterion in Test, performed significantly above chance in Test when all their trials are considered (N=80).
+
+test_summary <- notpassed_Test %>%
+  filter(!is.na(correct)) %>%
+  group_by(id) %>% 
+  summarize(correct = mean(correct))%>%
+  add_count(correct)
+
+#Here we can see the means of those in all trials of Test.
+
+###How about when we look at their last 16 trials only.
+test16<-read.csv("ripped_monkey_test16.csv", header=T) #this data is the last 16 trials of Test and 16 trials of Transfer combined.
+notpassed_only16 <-test16%>%
+  filter(phase == "test" & passedtest == "0") # this is only the test data, the last 16 trials and those who did not reach the criterion
+str(notpassed_only16)
+notpassed_only16$id<-as.factor(notpassed_only16$id)
+notpassed_only16$passedtest<-as.factor(notpassed_only16$passedtest)
+notpassed_only16$z.trialno<-as.vector(scale(notpassed_only16$trialno))
+
+notpassed_chance16 <- glmer(correct ~ 1 + (z.trialno | id), data=notpassed_only16, family=binomial)
+summary(notpassed_chance16)
+
+#Those who did not reach the criterion in the Test phase performed significantly above chance in the last 16 trials of their Test phase (session 9 and 10)
+
+test_summary2 <- notpassed_only16 %>%
+  filter(!is.na(correct)) %>%
+  group_by(id) %>% 
+  summarize(correct = mean(correct))%>%
+  add_count(correct)
+
+#They are above chance when considering the last 16 trials of Test (session 9 and 10 only) as well.
 ```
 
